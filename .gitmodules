@@ -1,0 +1,3 @@
+[submodule "web-profiler"]
+	path = web-profiler
+	url = git@github.com:dtnaylor/web-profiler.git
