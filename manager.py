@@ -24,7 +24,8 @@ HAR_GENERATOR_LOG='./logs/har_generator.log'
 PROFILER_LOG='./logs/profiler.log'
 
 URL_FILE='./web-profiler/tools/tmp_urls'
-USER_AGENTS={'chrome-37': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36'}
+USER_AGENTS={'default': None,
+             'chrome-37': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36'}
 TEMPDIR=os.path.join(tempfile.gettempdir(), 'https-dashboard')
 OUTDIR='./profiles'
 
@@ -59,7 +60,7 @@ def main():
     try:
         # make new directory in outdir named with today's date
         today = datetime.datetime.now().strftime('%Y-%m-%d')
-        OUT_SUBDIR = os.path.join(OUTDIR, today)
+        OUT_SUBDIR = os.path.abspath(os.path.join(OUTDIR, today))
         if os.path.exists(OUT_SUBDIR):
             backup_dir = '%s_backup-%s' %\
                 (OUT_SUBDIR, datetime.datetime.now().strftime('%H-%M-%S'))
@@ -78,32 +79,51 @@ def main():
 
 
     ##
-    ## STAGE ONE: Generate HARs for the URLs
+    ## Generate profiles
     ##
     for user_agent_tag in USER_AGENTS:
         try:
-            uagent_dir = os.path.join(OUT_SUBDIR, user_agent_tag)
+
+            ##
+            ## STAGE ONE: Generate HARs for the URLs
+            ##
+            uagent_tmpdir = os.path.join(TEMPDIR, user_agent_tag)
             har_cmd = '%s -f %s -o %s -u "%s" -g %s' %\
-                (HAR_GENERATOR, URL_FILE, uagent_dir, USER_AGENTS[user_agent_tag],\
+                (HAR_GENERATOR, URL_FILE, uagent_tmpdir, USER_AGENTS[user_agent_tag],\
                  HAR_GENERATOR_LOG)
             logging.debug('Running HAR genrator: %s', har_cmd)
             subprocess.check_call(har_cmd, shell=True)  # TODO: careful!
+    
+    
+            ##
+            ## STAGE TWO: Generate profiles
+            ##
+            uagent_outdir = os.path.join(OUT_SUBDIR, user_agent_tag)
+            profiler_cmd = '%s -d %s -o %s -g %s' %\
+                (PROFILER, uagent_tmpdir, uagent_outdir, PROFILER_LOG)
+            logging.debug('Running profiler: %s', profiler_cmd)
+            subprocess.check_call(profiler_cmd.split())
         except:
-            logging.exception('Error running HAR generator for user agent %s',\
-                user_agent_tag)
+            logging.exception('Error profiling user agent %s', user_agent_tag)
             # TODO: mark error?
 
-    ##
-    ## STAGE TWO: Generate profiles
-    ##
 
     ##
     ## Delete temp directories
     ##
+    shutil.rmtree(TEMPDIR)
 
     ##
     ## If successful, update "latest" symlink to point to today's data
     ##
+    # TODO: only update symlink if everything else was OK?
+    try:
+        latest_link = os.path.join(OUTDIR, 'latest')
+        if os.path.lexists(latest_link):
+            os.remove(latest_link)
+        os.symlink(OUT_SUBDIR, latest_link)
+    except:
+        logging.exception('Error making "latest" symlink')
 
 
 
