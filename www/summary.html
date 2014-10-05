@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HTTPS Dashboard: Summary</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+	<style>.tooltip-inner {max-width: 500px; width: 350px; }</style>
+
+  </head>
+  <body>
+
+	<div class="container">
+
+
+	<div class="page-header">
+		<ol class="breadcrumb">
+		  <li><a href="index.html">HTTPS Dashboard</a></li>
+		  <li class="active">Summary</li>
+		</ol>
+	  <h1>Summary</h1>
+	</div>
+
+
+	<!-- AVAILABILITY -->
+	<div class="row">
+		<div class="col-md-4 col-md-offset-4">
+			<div id="availability-pie-chart" style="width:100%; height:100%"></div>
+		</div> <!-- col-md-6 -->
+
+	</div> <!-- row -->
+	
+	
+	<!-- BASIC STATS -->
+	<div class="row">
+		<h2>Version Comparison&nbsp;<sup><a style="color:inherit;"data-toggle="tooltip" data-placement="right" title="Sites often serve different versions over HTTP and HTTPS. For the sites that support both protocols, these plots summarize these differences."><span class="glyphicon glyphicon-question-sign" style="font-size:16px"></span></a></sup>
+
+		<!-- sort dropdown -->
+		<div class="btn-group pull-right">
+		  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+		    Sort <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu" role="menu">
+		    <li><a href="javascript: load_basic_stats('sort-alpha');">Alphabetical</a></li>
+		    <li><a href="javascript: load_basic_stats('sort-http');">HTTP</a></li>
+		    <li><a href="javascript: load_basic_stats('sort-https');">HTTPS</a></li>
+		  </ul>
+		</div> <!-- sort dropdown -->
+
+		</h2>
+	</div> <!-- row -->
+
+
+	<!-- num_objects -->
+	<div class="row">
+		<div class="col-md-6">
+			<div id="num_objects" style="width:100%; height: 250px;"></div>
+		</div>  <!-- column -->
+		<div class="col-md-6">
+			<div id="num_objects-diff" style="width:100%; height: 250px;"></div>
+		</div>  <!-- column -->
+	</div> <!-- row -->
+	<p>&nbsp;</p>
+	
+	<!-- size -->
+	<div class="row">
+		<div class="col-md-6">
+			<div id="num_mbytes" style="width:100%; height: 250px;"></div>
+		</div>  <!-- column -->
+		<div class="col-md-6">
+			<div id="num_mbytes-diff" style="width:100%; height: 250px;"></div>
+		</div>  <!-- column -->
+	</div> <!-- row -->
+	<p>&nbsp;</p>
+	
+	<!-- num_connections -->
+	<div class="row">
+		<div class="col-md-6">
+			<div id="num_tcp_handshakes" style="width:100%; height: 250px;"></div>
+		</div>  <!-- column -->
+		<div class="col-md-6">
+			<div id="num_tcp_handshakes-diff" style="width:100%; height: 250px;"></div>
+		</div>  <!-- column -->
+	</div> <!-- row -->
+	<p>&nbsp;</p>
+	
+	<!-- num_hosts -->
+	<div class="row">
+		<div class="col-md-6">
+			<div id="num_hosts" style="width:100%; height: 250px;"></div>
+		</div>  <!-- column -->
+		<div class="col-md-6">
+			<div id="num_hosts-diff" style="width:100%; height: 250px;"></div>
+		</div>  <!-- column -->
+	</div> <!-- row -->
+	<p>&nbsp;</p>
+			
+
+
+	<!-- OBJECT LOAD PROTOCOLS -->
+	<div class="row">
+		<h2>Object Fetch Protocols&nbsp;<sup><a style="color:inherit;"data-toggle="tooltip" data-placement="right" title="Web pages are made up of several objects: HTML files, images, scripts, etc. Each one is fetched from the server separately. Sometimes, even when the main HTML document is loaded with HTTPS, some of the objects it contains are still loaded over HTTP."><span class="glyphicon glyphicon-question-sign" style="font-size:16px"></span></a></sup></h2>
+		<div class="col-md-6">
+			<!-- plot -->
+			<div id="http-site-counts" style="width:100%; height: 250px;"></div>
+
+			<!-- sort dropdown -->
+			<div class="btn-group pull-right">
+			  <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+			    Sort <span class="caret"></span>
+			  </button>
+			  <ul class="dropdown-menu" role="menu">
+			    <li><a href="javascript: load_protocol_counts('http', 'sort-alpha');">Alphabetical</a></li>
+			    <li><a href="javascript: load_protocol_counts('http', 'sort-http');">HTTP</a></li>
+			    <li><a href="javascript: load_protocol_counts('http', 'sort-https');">HTTPS</a></li>
+			  </ul>
+			</div>
+		</div>  <!-- HTTP column -->
+
+		<div class="col-md-6">
+			<!-- plot -->
+			<div id="https-site-counts" style="width:100%; height: 250px;"></div>
+			
+			<!-- sort dropdown -->
+			<div class="btn-group pull-right">
+			  <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+			    Sort <span class="caret"></span>
+			  </button>
+			  <ul class="dropdown-menu" role="menu">
+			    <li><a href="javascript: load_protocol_counts('https', 'sort-alpha');">Alphabetical</a></li>
+			    <li><a href="javascript: load_protocol_counts('https', 'sort-http');">HTTP</a></li>
+			    <li><a href="javascript: load_protocol_counts('https', 'sort-https');">HTTPS</a></li>
+			  </ul>
+			</div>
+		</div>  <!-- HTTPS column -->
+	</div> <!-- row -->
+
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+	<p>&nbsp;</p>
+
+
+    </div> <!-- container -->
+
+
+
+
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+	<!-- Enable tooltips -->
+	<script>$(function () { $("[data-toggle='tooltip']").tooltip(); });</script>
+	<!-- HighStart (for the charts) -->
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<!-- load data -->
+	<script src="./js/loadsummary.js"></script>
+  </body>
+</html>
