@@ -1,8 +1,9 @@
 - add images to profiles (thumbnail; click to see full image)
 - generate image thumbnails in python
 - add header to all pages:
-	- breadcrumb
-	- Name/logo?
-	- User agent selector
-		- Populate with available user agents when any page loads; store in local storage (when does local storage get cleared?)
+	- breadcrumb?
+	- group/site info ("about")
 - show crawl time/date
+- think about what should be local storage vs. session storage
+- path manipulation library?
+- page w/ user agent details.

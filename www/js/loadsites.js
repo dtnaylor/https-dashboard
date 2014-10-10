@@ -1,4 +1,7 @@
 /* ========================= COMMON HELPER FUNCTIONS ======================== */
+/*
+ * Wrapper for localStorage
+ */
 var Storage = {
 	set: function(key, value) {
 		localStorage[key] = JSON.stringify(value);
@@ -13,10 +16,35 @@ var Storage = {
 	},
 };
 
+/*
+ * Load the manifest dictionary and put in local storage
+ */
 function load_manifest(manifest_path) {
 	$.getJSON(manifest_path, function(manifest) {
 		Storage.set('manifest', manifest);
 	});
+}
+
+/*
+ * Set the displayed user agent name
+ */
+function set_user_agent_display(user_agent) {
+	manifest = Storage.get('manifest');
+	display = document.getElementById("user-agent-display");
+	display.innerHTML = manifest["user-agents"][user_agent]["name"];
+}
+
+/*
+ * Change the user agent and refresh the page.
+ * user_agent argument should be a key in the user-agents dict in manifest
+ */
+function change_user_agent(user_agent) {
+	Storage.set('current-user-agent', user_agent);
+	set_user_agent_display(user_agent);
+
+	// reload page data
+	main(Storage.get('profile-dir'), Storage.get('current-user-agent'));
+	console.log('changing user agent to: ' + user_agent);
 }
 
 
@@ -25,14 +53,26 @@ function load_manifest(manifest_path) {
  */
 $(function () {
 	var profile_dir = './profiles/';
+	Storage.set('profile-dir', profile_dir);  // TODO: something better?
 	load_manifest(profile_dir + 'manifest.json');
 
+	// load user agent menu
 	if (!Storage.exists('current-user-agent')) {
 		Storage.set('current-user-agent', 'default');
 	}
+	set_user_agent_display(Storage.get('current-user-agent'));
+	user_agents = Storage.get('manifest')['user-agents'];
+	user_agent_menu = document.getElementById("user-agent-menu");
+	for (var user_agent in user_agents) {
+		user_agent_menu.innerHTML =
+			'<li><a href="javascript: change_user_agent(\'' + user_agent + '\');">' 
+			+ user_agents[user_agent]['name'] 
+			+ '</a></li>'
+			+ user_agent_menu.innerHTML;
+	}
 
 	// call page-specific main()
-	main(profile_dir);
+	main(profile_dir, Storage.get('current-user-agent'));
 });
 
 
@@ -104,8 +144,9 @@ function only_both(sites) {
 /* 
  * MAIN
  */
-function main(profile_dir) {
-	$.getJSON(profile_dir + 'summary.json', function(data) {
+function main(profile_dir, user_agent) {
+	summary_path = profile_dir + user_agent + '/summary.json';
+	$.getJSON(summary_path, function(data) {
 		/*
 		 * Site URL list
 		 */
