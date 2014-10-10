@@ -14,6 +14,7 @@ import subprocess
 import tempfile
 import shutil
 import datetime
+import json
 
 HAR_GENERATOR = './web-profiler/tools/har_generator.py'
 PROFILER = './profiler.py'
@@ -72,10 +73,22 @@ def main():
         for user_agent_tag in USER_AGENTS:
             os.makedirs(os.path.join(OUT_SUBDIR, user_agent_tag))
 
+        # write manifest file
+        # TODO: add crawl date
+        manifest = {
+            'user-agents': USER_AGENTS,
+        }
+        manifest_file = os.path.join(OUT_SUBDIR, 'manifest.json')
+        with open(manifest_file, 'w') as f:
+            json.dump(manifest, f)
+        f.closed
+
         logging.info('Set up output subdirectory: %s', OUT_SUBDIR)
     except:
         logging.exception('Error preparing output directory')
         sys.exit(-1)
+
+    return
 
 
     ##
