@@ -1,3 +1,49 @@
+/* ========================= COMMON HELPER FUNCTIONS ======================== */
+var Storage = {
+	set: function(key, value) {
+		localStorage[key] = JSON.stringify(value);
+	},
+
+	get: function(key) {
+		return localStorage[key] ? JSON.parse(localStorage[key]) : null;
+	}
+};
+
+function load_manifest(manifest_path) {
+	$.getJSON(manifest_path, function(manifest) {
+		Storage.set('manifest', manifest);
+	});
+}
+
+
+/*
+ * MAIN ENTRY POINT
+ */
+$(function () {
+	var profile_dir = './profiles/';
+	load_manifest(profile_dir + 'manifest.json');
+
+	// call page-specific main()
+	main(profile_dir);
+});
+
+
+/* ========================================================================== */
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * HELPER FUNCTIONS
+ */
 function getSearchParameters() {
       var prmstr = window.location.search.substr(1);
       return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
@@ -60,6 +106,11 @@ function dicts_to_pie_data(dict1, dict2) {
 	return pie_data;
 }
 
+
+
+/*
+ * PLOTTING FUNCTIONS
+ */
 function make_pie_chart(id, title, data, tooltip_postfix) {
     $(id).highcharts({
         chart: {
@@ -168,10 +219,8 @@ function make_stacked_bar(id, title, ylabel, tooltip_postfix, stacking, categori
 /*
  * metric is either 'count' or 'size'
  */
-function load_object_type_breakdown(metric, stacking) {
+function load_object_type_breakdown(profile_path, metric, stacking) {
 	// Get the path to the site's JSON profile
-	// TODO: refactor this
-	var profile_path = './alexa-top500/';
 	var params = getSearchParameters();
 	if (params.hasOwnProperty("site")) {
 		profile_path += params["site"] + ".json";
@@ -208,17 +257,22 @@ function load_object_type_breakdown(metric, stacking) {
 }
 
 
-$(function () {
-	// Get the path to the site's JSON profile
-	var profile_path = './alexa-top500/';
+
+
+
+
+/* 
+ * MAIN
+ */
+function main(profile_dir) {
 	var params = getSearchParameters();
 	if (params.hasOwnProperty("site")) {
-		profile_path += params["site"] + ".json";
+		profile_dir += params["site"] + ".json";
 	} else {
 		return -1;
 	}
 
-	$.getJSON(profile_path, function(data) {
+	$.getJSON(profile_dir, function(data) {
 
 		/*
 		 * Site URL
@@ -385,5 +439,5 @@ $(function () {
 
 	});
 
-	load_object_type_breakdown('count', 'normal');
-});
+	load_object_type_breakdown(profile_dir, 'count', 'normal');
+}

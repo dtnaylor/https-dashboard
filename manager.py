@@ -25,9 +25,12 @@ HAR_GENERATOR_LOG='./logs/har_generator.log'
 PROFILER_LOG='./logs/profiler.log'
 
 URL_FILE='./web-profiler/tools/tmp_urls'
-USER_AGENTS={'default': None,
-             'chrome-37-osx': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36',
-             'chrome-18-android': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19',
+USER_AGENTS={'default': 
+                {'name': 'Default', 'string': None},
+             'chrome-37-osx':
+                {'name': 'Chrome 37 (OSX)', 'string': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36'},
+             'chrome-18-android':
+                {'name': 'Chrome 18 (Android)', 'string': 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19'},
 }
 TEMPDIR=os.path.join(tempfile.gettempdir(), 'https-dashboard')
 OUTDIR='./profiles'
@@ -104,7 +107,7 @@ def main():
             ##
             uagent_tmpdir = os.path.join(TEMPDIR, user_agent_tag)
             har_cmd = '%s -f %s -o %s -u "%s" -g %s' %\
-                (HAR_GENERATOR, URL_FILE, uagent_tmpdir, USER_AGENTS[user_agent_tag],\
+                (HAR_GENERATOR, URL_FILE, uagent_tmpdir, USER_AGENTS[user_agent_tag]['string'],\
                  HAR_GENERATOR_LOG)
             logging.debug('Running HAR genrator: %s', har_cmd)
             subprocess.check_call(har_cmd, shell=True)  # TODO: careful!

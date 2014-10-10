@@ -1,3 +1,55 @@
+/* ========================= COMMON HELPER FUNCTIONS ======================== */
+var Storage = {
+	set: function(key, value) {
+		localStorage[key] = JSON.stringify(value);
+	},
+
+	get: function(key) {
+		return localStorage[key] ? JSON.parse(localStorage[key]) : null;
+	},
+
+	exists: function(key) {
+		return localStorage[key] != null;
+	},
+};
+
+function load_manifest(manifest_path) {
+	$.getJSON(manifest_path, function(manifest) {
+		Storage.set('manifest', manifest);
+	});
+}
+
+
+/*
+ * MAIN ENTRY POINT
+ */
+$(function () {
+	var profile_dir = './profiles/';
+	load_manifest(profile_dir + 'manifest.json');
+
+	if (!Storage.exists('current-user-agent')) {
+		Storage.set('current-user-agent', 'default');
+	}
+
+	// call page-specific main()
+	main(profile_dir);
+});
+
+
+/* ========================================================================== */
+
+
+
+
+
+
+
+
+
+
+
+
+
 function ulWriter(rowIndex, record, columns, cellWriter) {
 
 	var row = "<tr>";
@@ -49,8 +101,11 @@ function only_both(sites) {
 }
 
 
-$(function () {
-	$.getJSON('./alexa-top500/summary.json', function(data) {
+/* 
+ * MAIN
+ */
+function main(profile_dir) {
+	$.getJSON(profile_dir + 'summary.json', function(data) {
 		/*
 		 * Site URL list
 		 */
@@ -76,4 +131,4 @@ $(function () {
 		//})
 		//$("#site-table tbody").html(tbl_body);
 	});
-});
+}
