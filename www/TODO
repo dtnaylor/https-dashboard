@@ -1,9 +1,12 @@
 - add images to profiles (thumbnail; click to see full image)
-- generate image thumbnails in python
-- add header to all pages:
-	- breadcrumb?
-	- group/site info ("about")
+- generate image thumbnails in python (fixed size)
+- figure out cropping path along bottom of thumbnail
+- about page
+- HTTPS explanations
 - show crawl time/date
 - think about what should be local storage vs. session storage
-- path manipulation library?
+- file path manipulation library?
 - page w/ user agent details.
+- check reliability of protocol availability
+- localStorage keys should be qualified: edu.cmu.httpsdashboard.X
+- fix image export name in python (pick HTTP or HTTPS, no trial0)

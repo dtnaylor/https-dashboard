@@ -17,15 +17,64 @@
 
 
 
+
+	<!-- =============== COMMON HEADER =============== -->
+	<nav class="navbar navbar-default" role="navigation">
+	  <div class="container-fluid">
+	    <!-- Brand and toggle get grouped for better mobile display -->
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="index.html">HTTPS Dashboard</a>
+	    </div>
+	
+	    <!-- Collect the nav links, forms, and other content for toggling -->
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+	  	<!-- LINKS (left) -->
+	      <ul class="nav navbar-nav">
+	        <li><a href="summary.html">Summary</a></li>
+	        <li class="active"><a href="sites.html">Per-Site Details</a></li>
+	        <li><a href="about.html">About</a></li>
+	      </ul>
+
+	  	<!-- CONTROL MENUS (right) -->
+	      <ul class="nav navbar-nav navbar-right">
+	  	  <!-- USER AGENT -->
+	  	  <li><p class="navbar-text">User Agent:</p></li>
+	        <li class="dropdown">
+	          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="user-agent-display">User Agent</span> <span class="caret"></span></a>
+	          <ul class="dropdown-menu" role="menu" id="user-agent-menu">
+	  		  <!-- to be filled in programatically on page load -->
+	            <li class="divider"></li>
+	            <li><a href="#">Details</a></li>
+	          </ul>
+	        </li>
+	      </ul>
+	    </div><!-- /.navbar-collapse -->
+	  </div><!-- /.container-fluid -->
+	</nav><!-- navbar -->
+	<!-- ============= END COMMON HEADER ============= -->
+
+
+
+
+
+
+
+
+
+
+
 	<div class="container theme-showcase" role="main">
 
 
 	<div class="page-header">
-		<ol class="breadcrumb">
-		  <li><a href="index.html">HTTPS Dashboard</a></li>
-		  <li id="sites"><a href="sites.html">Sites</a></li>
-		  <li id="site-breadcrumb" class="active">Profile</li>
-		</ol>
+		<a href="sites.html"><span class="glyphicon glyphicon-arrow-left"></span> back to sites</a>
 	  	<h1 id="site-url">Site URL</h1>
 	</div>
 	
@@ -33,11 +82,13 @@
 
 	<!-- basic stats bar chart -->
 	<div class="row">
-		<div class="col-md-10 col-md-offset-1">
-
+		<div class="col-md-7 col-md-offset-1">
 			<div id="basic-stats" style="width=100%; height: 350px;"></div>
-			
-		</div> <!-- col-md-6 -->
+		</div> <!-- stat chart column -->
+
+		<div class="col-md-3">
+			<img id="site-thumbnail" style="max-height: 350px;" clip-path="url(#thumbnail-bottom-path)"/>
+		</div> <!-- thumbnail column -->
 	</div> <!-- row -->
 
 	
@@ -140,7 +191,15 @@
     </div> <!-- container -->
 
 
-
+	<!-- clipping path for site thumbnail -->
+	<!-- http://www.html5rocks.com/en/tutorials/masking/adobe/ -->
+	<svg width="0" height="0">
+	  <defs>
+	    <clipPath id="thumbnail-bottom-path">
+	       <path d="M 14.8492 10.0868 L 80.6102 35.5426 L 125.865 6.55125 L 152.028 36.9568 L 199.404 8.67257 L 255.973 41.9066 L 305.47 3.72283 L 362.039 36.2497 L 386.787 8.67257 L 454.67 44.0279 L 477.297 9.37968 L 502.753 27.7645 L 555.079 7.96547 L 565.685 32.0071 L 530.33 98.4751 L 567.1 153.629 L 523.259 190.399 L 563.564 254.039 L 528.916 280.909 L 567.1 352.326 L 543.058 418.087 L 501.339 388.389 L 441.235 423.037 L 414.365 391.217 L 325.976 420.916 L 272.236 393.339 L 248.902 420.916 L 178.898 389.803 L 108.894 420.209 L 65.7609 392.632 L 35.3553 420.916 L 0.707107 391.217 L 24.7487 318.385 L 2.82843 266.767 L 29.6985 245.553 L 1.41421 191.813 L 29.6985 123.224 L 3.53553 82.2117 L 26.8701 46.8563 Z"></path>
+	    </clipPath>
+	  </defs>
+	</svg>
 
 
 
@@ -148,11 +207,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
-	<!-- Enable tooltips -->
+	<!-- Enable tooltips TODO: remove?-->
 	<script>$(function () { $("[data-toggle='tooltip']").tooltip(); });</script>
 	<!-- HighStart (for the charts) -->
 	<script src="http://code.highcharts.com/highcharts.js"></script>
 	<!-- load data -->
-	<script src="./js/loadprofile.js"></script>
+	<script src="./js/profile.js"></script>
+	<script src="./js/common.js"></script>
   </body>
 </html>

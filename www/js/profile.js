@@ -1,46 +1,3 @@
-/* ========================= COMMON HELPER FUNCTIONS ======================== */
-var Storage = {
-	set: function(key, value) {
-		localStorage[key] = JSON.stringify(value);
-	},
-
-	get: function(key) {
-		return localStorage[key] ? JSON.parse(localStorage[key]) : null;
-	}
-};
-
-function load_manifest(manifest_path) {
-	$.getJSON(manifest_path, function(manifest) {
-		Storage.set('manifest', manifest);
-	});
-}
-
-
-/*
- * MAIN ENTRY POINT
- */
-$(function () {
-	var profile_dir = './profiles/';
-	load_manifest(profile_dir + 'manifest.json');
-
-	// call page-specific main()
-	main(profile_dir);
-});
-
-
-/* ========================================================================== */
-
-
-
-
-
-
-
-
-
-
-
-
 /*
  * HELPER FUNCTIONS
  */
@@ -219,16 +176,12 @@ function make_stacked_bar(id, title, ylabel, tooltip_postfix, stacking, categori
 /*
  * metric is either 'count' or 'size'
  */
-function load_object_type_breakdown(profile_path, metric, stacking) {
+function load_object_type_breakdown(profile_dir, user_agent, metric, stacking) {
 	// Get the path to the site's JSON profile
 	var params = getSearchParameters();
-	if (params.hasOwnProperty("site")) {
-		profile_path += params["site"] + ".json";
-	} else {
-		return -1;
-	}
+	if (!params.hasOwnProperty("site")) return -1;
 
-	$.getJSON(profile_path, function(data) {
+	$.getJSON(get_profile(profile_dir, user_agent, params["site"]), function(data) {
 		/*
 		 * Object Type Bars
 		 */
@@ -264,21 +217,21 @@ function load_object_type_breakdown(profile_path, metric, stacking) {
 /* 
  * MAIN
  */
-function main(profile_dir) {
+function main(profile_dir, user_agent) {
 	var params = getSearchParameters();
-	if (params.hasOwnProperty("site")) {
-		profile_dir += params["site"] + ".json";
-	} else {
-		return -1;
-	}
+	if (!params.hasOwnProperty("site")) return -1;
 
-	$.getJSON(profile_dir, function(data) {
+	$.getJSON(get_profile(profile_dir, user_agent, params["site"]), function(data) {
 
 		/*
 		 * Site URL
 		 */
 		document.getElementById("site-url").innerHTML = data["base-url"];
-		document.getElementById("site-breadcrumb").innerHTML = data["base-url"];
+
+		/*
+		 * Site thumbnail
+		 */
+		document.getElementById("site-thumbnail").src = get_thumbnail(profile_dir, user_agent, params["site"]);
 
 
 		/*
@@ -439,5 +392,5 @@ function main(profile_dir) {
 
 	});
 
-	load_object_type_breakdown(profile_dir, 'count', 'normal');
+	load_object_type_breakdown(profile_dir, user_agent, 'count', 'normal');
 }

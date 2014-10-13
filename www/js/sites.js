@@ -1,95 +1,3 @@
-/* ========================= COMMON HELPER FUNCTIONS ======================== */
-/*
- * Wrapper for localStorage
- */
-var Storage = {
-	set: function(key, value) {
-		localStorage[key] = JSON.stringify(value);
-	},
-
-	get: function(key) {
-		return localStorage[key] ? JSON.parse(localStorage[key]) : null;
-	},
-
-	exists: function(key) {
-		return localStorage[key] != null;
-	},
-};
-
-/*
- * Load the manifest dictionary and put in local storage
- */
-function load_manifest(manifest_path) {
-	$.getJSON(manifest_path, function(manifest) {
-		Storage.set('manifest', manifest);
-	});
-}
-
-/*
- * Set the displayed user agent name
- */
-function set_user_agent_display(user_agent) {
-	manifest = Storage.get('manifest');
-	display = document.getElementById("user-agent-display");
-	display.innerHTML = manifest["user-agents"][user_agent]["name"];
-}
-
-/*
- * Change the user agent and refresh the page.
- * user_agent argument should be a key in the user-agents dict in manifest
- */
-function change_user_agent(user_agent) {
-	Storage.set('current-user-agent', user_agent);
-	set_user_agent_display(user_agent);
-
-	// reload page data
-	main(Storage.get('profile-dir'), Storage.get('current-user-agent'));
-	console.log('changing user agent to: ' + user_agent);
-}
-
-
-/*
- * MAIN ENTRY POINT
- */
-$(function () {
-	var profile_dir = './profiles/';
-	Storage.set('profile-dir', profile_dir);  // TODO: something better?
-	load_manifest(profile_dir + 'manifest.json');
-
-	// load user agent menu
-	if (!Storage.exists('current-user-agent')) {
-		Storage.set('current-user-agent', 'default');
-	}
-	set_user_agent_display(Storage.get('current-user-agent'));
-	user_agents = Storage.get('manifest')['user-agents'];
-	user_agent_menu = document.getElementById("user-agent-menu");
-	for (var user_agent in user_agents) {
-		user_agent_menu.innerHTML =
-			'<li><a href="javascript: change_user_agent(\'' + user_agent + '\');">' 
-			+ user_agents[user_agent]['name'] 
-			+ '</a></li>'
-			+ user_agent_menu.innerHTML;
-	}
-
-	// call page-specific main()
-	main(profile_dir, Storage.get('current-user-agent'));
-});
-
-
-/* ========================================================================== */
-
-
-
-
-
-
-
-
-
-
-
-
-
 function ulWriter(rowIndex, record, columns, cellWriter) {
 
 	var row = "<tr>";
@@ -145,11 +53,16 @@ function only_both(sites) {
  * MAIN
  */
 function main(profile_dir, user_agent) {
+	console.log('main; user agent: ' + user_agent);
 	summary_path = profile_dir + user_agent + '/summary.json';
 	$.getJSON(summary_path, function(data) {
+		console.log('summary path: ' + summary_path);
+		console.log('loaded site json!');
+		console.log(only_both(data["sites"]));
 		/*
 		 * Site URL list
 		 */
+
 		$('#site-table').dynatable({
 		  writers: {
 		    _rowWriter: ulWriter
@@ -158,10 +71,13 @@ function main(profile_dir, user_agent) {
 		    records: only_both(data["sites"])   // TODO: temporary
 		  }
 		});
-		
 		var dynatable = $('#site-table').data('dynatable');
+		//console.log(dynatable);
+		
 		dynatable.paginationPerPage.set(100); // Show 100 records per page
-		dynatable.process();
+		dynatable.process(true);  // true means don't change URL so back changes table
+		
+		console.log('done processing');
 
 
 		//var tbl_body = "";

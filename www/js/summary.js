@@ -1,59 +1,12 @@
-/* ========================= COMMON HELPER FUNCTIONS ======================== */
-var Storage = {
-	set: function(key, value) {
-		localStorage[key] = JSON.stringify(value);
-	},
-
-	get: function(key) {
-		return localStorage[key] ? JSON.parse(localStorage[key]) : null;
-	}
-};
-
-function load_manifest(manifest_path) {
-	$.getJSON(manifest_path, function(manifest) {
-		Storage.set('manifest', manifest);
-	});
-}
-
-
-/*
- * MAIN ENTRY POINT
- */
-$(function () {
-	var profile_dir = './profiles/';
-	load_manifest(profile_dir + 'manifest.json');
-
-	// call page-specific main()
-	main(profile_dir);
-});
-
-
-/* ========================================================================== */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
  * MAIN
  */
-function main(profile_dir) {
-	load_basic_stats('sort-alpha');
-	load_protocol_counts('http', 'sort-alpha');
-	load_protocol_counts('https', 'sort-alpha');
+function main(profile_dir, user_agent) {
+	load_basic_stats(profile_dir, user_agent, 'sort-alpha');
+	load_protocol_counts(profile_dir, user_agent, 'http', 'sort-alpha');
+	load_protocol_counts(profile_dir, user_agent, 'https', 'sort-alpha');
 
-	$.getJSON(profile_dir + 'summary.json', function(data) {
+	$.getJSON(profile_dir + user_agent + '/summary.json', function(data) {
 		/*
 		 *  Protocol availability
 		 */
@@ -88,16 +41,16 @@ function main(profile_dir) {
 	});
 }
 
-function load_basic_stats(sort) {
+function load_basic_stats(profile_dir, user_agent, sort) {
 	var basic_stats = ["num_objects", "num_tcp_handshakes", "num_mbytes", "num_hosts"];
 	basic_stats.forEach(function(stat) {
-		load_basic_stat(stat, sort);
-		load_basic_stat_diff(stat, sort);
+		load_basic_stat(profile_dir, user_agent, stat, sort);
+		load_basic_stat_diff(profile_dir, user_agent, stat, sort);
 	});
 }
 
-function load_protocol_counts(site, sort) {
-	$.getJSON('./profiles/summary.json', function(data) {
+function load_protocol_counts(profile_dir, user_agent, site, sort) {
+	$.getJSON(profile_dir + user_agent + '/summary.json', function(data) {
 		/*
 		 * protocol count stack plots
 		 */
@@ -166,8 +119,8 @@ ylabels["num_tcp_handshakes"] = "Number of TCP Connections";
 ylabels["num_mbytes"] = "Total Size (MB)";
 ylabels["num_hosts"] = "Number of Hosts";
 
-function load_basic_stat(stat, sort) {
-	$.getJSON('./alexa-top500/summary.json', function(data) {
+function load_basic_stat(profile_dir, user_agent, stat, sort) {
+	$.getJSON(profile_dir + user_agent + '/summary.json', function(data) {
     	$('#'+stat).highcharts({
     	    chart: {
     	        type: 'area'
@@ -247,8 +200,8 @@ function assign_threshold_colors(data, threshold) {
 	return colored_data;
 }
 
-function load_basic_stat_diff(stat, sort) {
-	$.getJSON('./profiles/summary.json', function(data) {
+function load_basic_stat_diff(profile_dir, user_agent, stat, sort) {
+	$.getJSON(profile_dir + user_agent + '/summary.json', function(data) {
     	$('#'+stat+"-diff").highcharts({
     	    chart: {
     	        type: 'column'

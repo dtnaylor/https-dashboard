@@ -14,11 +14,9 @@
   </head>
   <body>
 
-	<div class="container">
 
 
 	<!-- =============== COMMON HEADER =============== -->
-	<!-- TODO: where to put this??? -->
 	<nav class="navbar navbar-default" role="navigation">
 	  <div class="container-fluid">
 	    <!-- Brand and toggle get grouped for better mobile display -->
@@ -39,6 +37,7 @@
 	      <ul class="nav navbar-nav">
 	        <li><a href="summary.html">Summary</a></li>
 	        <li class="active"><a href="sites.html">Per-Site Details</a></li>
+	        <li><a href="about.html">About</a></li>
 	      </ul>
 
 	  	<!-- CONTROL MENUS (right) -->
@@ -57,11 +56,13 @@
 	    </div><!-- /.navbar-collapse -->
 	  </div><!-- /.container-fluid -->
 	</nav><!-- navbar -->
-	<ol class="breadcrumb">
-	  <li><a href="index.html">HTTPS Dashboard</a></li>
-	  <li id="sites" class="active">Sites</li>
-	</ol>
 	<!-- ============= END COMMON HEADER ============= -->
+	
+	
+	
+	
+	
+	<div class="container">
 
 	<div class="page-header">
 	  <h1>Sites</h1>
@@ -78,7 +79,7 @@
 					<th style="display:none">Support Sort</th>
 				</thead>
 
-				<tbody></tbody>
+				<tbody id="site-table-body"></tbody>
 			</table>
 		</div>  <!-- object details -->
 	</div> <!-- row -->
@@ -99,6 +100,7 @@
 	<!-- HighCharts (for the charts) -->
 	<script src="http://code.highcharts.com/highcharts.js"></script>
 	<!-- load data -->
-	<script src="./js/loadsites.js"></script>
+	<script src="./js/sites.js"></script>
+	<script src="./js/common.js"></script>
   </body>
 </html>
