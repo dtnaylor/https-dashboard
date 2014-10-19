@@ -16,6 +16,8 @@ import shutil
 import datetime
 import json
 
+import thumbnailer
+
 HAR_GENERATOR = './web-profiler/tools/har_generator.py'
 PROFILER = './profiler.py'
 
@@ -121,6 +123,13 @@ def main():
                 (PROFILER, uagent_tmpdir, uagent_outdir, PROFILER_LOG)
             logging.debug('Running profiler: %s', profiler_cmd)
             subprocess.check_call(profiler_cmd.split())
+
+            ##
+            ## STAGE THREE: Prepare image thumbnails
+            ##
+            # TODO: test
+            screenshot_dir = os.path.join(uagent_outdir, 'site_screenshots')
+            thumbnailer.process_image_dir(screenshot_dir)
         except:
             logging.exception('Error profiling user agent %s', user_agent_tag)
             # TODO: mark error?

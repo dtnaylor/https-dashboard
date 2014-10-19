@@ -54,3 +54,6 @@ docs/_build/
 
 # vim
 *.swp
+
+# OSX
+*.DS_Store
