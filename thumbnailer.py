@@ -15,10 +15,11 @@ import logging
 import re
 import glob
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 
 THUMBNAIL_SIZE = (200, 300)
+TOOTH_SIZE = 20
 
 
 def process_image_file(image_file):
@@ -36,8 +37,8 @@ def process_image_file(image_file):
     thumb_name = '%s-%s_thumb%s' % (site, protocol, ext)
     thumb_path = os.path.join(img_dir, thumb_name)
 
-    os.rename(image_file, img_path)
-
+    #os.rename(image_file, img_path)
+    img_path=image_file  # TODO remove
 
     # now prepare thumbnail
     im = Image.open(img_path)
@@ -62,6 +63,15 @@ def process_image_file(image_file):
 
     # scale image down to thumbnail size
     im.thumbnail(THUMBNAIL_SIZE, Image.ANTIALIAS)
+
+    # draw jagged path on bottom edge to indicate we cut some content
+    coords = []
+    for i in range(THUMBNAIL_SIZE[0]/TOOTH_SIZE + 1):
+        y = THUMBNAIL_SIZE[1] if i%2==0 else THUMBNAIL_SIZE[1]-TOOTH_SIZE
+        coords.append((i*TOOTH_SIZE, y)) 
+    canvas = ImageDraw.Draw(im)
+    canvas.polygon(coords, fill="#FFFFFF")
+
     im.save(thumb_path)
 
 
