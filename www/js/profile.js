@@ -229,9 +229,13 @@ function main(profile_dir, user_agent) {
 		document.getElementById("site-url").innerHTML = data["base-url"];
 
 		/*
-		 * Site thumbnail
+		 * Site thumbnails
 		 */
-		document.getElementById("site-thumbnail").src = get_thumbnail(profile_dir, user_agent, params["site"]);
+		// TODO: handle non-existent screenshots
+		document.getElementById("http-site-thumbnail").src = get_thumbnail(profile_dir, user_agent, params["site"], 'http');
+		document.getElementById("https-site-thumbnail").src = get_thumbnail(profile_dir, user_agent, params["site"], 'https');
+		document.getElementById("http-screenshot-link").href = get_screenshot(profile_dir, user_agent, params["site"], 'http');
+		document.getElementById("https-screenshot-link").href = get_screenshot(profile_dir, user_agent, params["site"], 'https');
 
 
 		/*

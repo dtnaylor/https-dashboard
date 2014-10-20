@@ -36,10 +36,17 @@ function get_profile(profile_dir, user_agent, site) {
 /*
  * Return the path to the thumbnail for a given site
  */
-function get_thumbnail(profile_dir, user_agent, site) {
-	// TODO: return HTTP version? HTTPS version? pick one in python?
-	// TODO: get rid of trial0
-	return profile_dir + user_agent + '/site_screenshots/http---' + site + "_trial0.png";
+function get_thumbnail(profile_dir, user_agent, site, protocol) {
+	return profile_dir + user_agent + '/site_screenshots/' + site + '-' 
+		+ protocol + '_thumb.png';
+}
+
+/*
+ * Return the path to the screenshot for a given site
+ */
+function get_screenshot(profile_dir, user_agent, site, protocol) {
+	return profile_dir + user_agent + '/site_screenshots/' + site + '-' 
+		+ protocol + '.png';
 }
 
 
