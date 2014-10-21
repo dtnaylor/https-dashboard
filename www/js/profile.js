@@ -222,6 +222,7 @@ function main(profile_dir, user_agent) {
 	if (!params.hasOwnProperty("site")) return -1;
 
 	$.getJSON(get_profile(profile_dir, user_agent, params["site"]), function(data) {
+		console.log(data);
 
 		/*
 		 * Site URL
@@ -394,6 +395,11 @@ function main(profile_dir, user_agent) {
 		})
 		$("#object-details-table tbody").html(tbl_body);
 
+	})
+	.fail(function() {  // getting JSON failed
+		error_alert = document.getElementById("error-alert");
+		error_alert.innerHTML = '<strong>Oops!</strong> There was a problem loading the profile for ' + params["site"] + ' with user agent ' + user_agent + '.';
+		error_alert.style.display = "inherit";
 	});
 
 	load_object_type_breakdown(profile_dir, user_agent, 'count', 'normal');
