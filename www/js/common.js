@@ -5,14 +5,17 @@
  */
 var Storage = {
 	set: function(key, value) {
+		key = 'edu.cmu.cs.httpsdashboard.' + key;
 		localStorage[key] = JSON.stringify(value);
 	},
 
 	get: function(key) {
+		key = 'edu.cmu.cs.httpsdashboard.' + key;
 		return localStorage[key] ? JSON.parse(localStorage[key]) : null;
 	},
 
 	exists: function(key) {
+		key = 'edu.cmu.cs.httpsdashboard.' + key;
 		return localStorage[key] != null;
 	},
 };
@@ -21,8 +24,14 @@ var Storage = {
  * Load the manifest dictionary and put in local storage
  */
 function load_manifest(manifest_path) {
-	$.getJSON(manifest_path, function(manifest) {
-		Storage.set('manifest', manifest);
+	// using .ajax so call is synchronous
+	$.ajax({
+	  url: manifest_path,
+	  dataType: 'json',
+	  async: false,
+	  success: function(data) {
+		Storage.set('manifest', data);
+	  }
 	});
 }
 
