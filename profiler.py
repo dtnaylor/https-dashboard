@@ -178,95 +178,72 @@ def compare_objects(har1, har2, do_print=False):
     return objects, counts, total
 
 
-def save_https_profile(https_har, outdir):
-    '''Save a profile for the HTTPS HAR'''
-    # will eventually dump this dict to JSON
-    profile = {}
-    
-    ##
-    ## Availability
-    ##
-    profile['availability'] = 'https-only'
-    
-    ##
-    ## Save as JSON
-    ##
-    filename = '%s.json' % Har.sanitize_url(https_har.url.split('://')[1])
-    filepath = os.path.join(outdir, filename)
-    with open(filepath, 'w') as f:
-        json.dump(profile, f)
-    f.closed
-
-
-def save_http_profile(http_har, outdir):
-    '''Save a profile for the HTTP HAR'''
-    # will eventually dump this dict to JSON
-    profile = {}
-    
-    ##
-    ## Availability
-    ##
-    profile['availability'] = 'http-only'
-    
-    ##
-    ## Save as JSON
-    ##
-    filename = '%s.json' % Har.sanitize_url(http_har.url.split('://')[1])
-    filepath = os.path.join(outdir, filename)
-    with open(filepath, 'w') as f:
-        json.dump(profile, f)
-    f.closed
-
-
-def save_profile(har1, har2, outdir):
+def save_profile(http_har, https_har, outdir):
     '''Save a joint profile comparing the two HARs, for use in the HTTPS dashboard'''
     # will eventually dump this dict to JSON
     profile = {}
-    
-    # figure out which HAR is http and https
-    http_har = get_http_har(har1, har2)
-    https_har = get_https_har(har1, har2)
 
     ##
     ## Availability
     ##
-    profile['availability'] = 'both'
+    if http_har and not https_har:
+        profile['availability'] = 'http-only'
+    elif not http_har and https_har:
+        profile['availability'] = 'https-only'
+    else:
+        profile['availability'] = 'both'
+        
+    
+    ## figure out which HAR is http and https
+    #http_har = get_http_har(har1, har2)
+    #https_har = get_https_har(har1, har2)
+
 
     ##
     ## Individual profiles
     ##
-    profile['http-profile'] = http_har.profile
-    profile['https-profile'] = https_har.profile
+    if http_har: profile['http-profile'] = http_har.profile
+    if https_har: profile['https-profile'] = https_har.profile
 
     ##
     ## URLs
     ##
-    profile['base-url'] = http_har.url.split('://')[1]
-    profile['http-url'] = http_har.url
-    profile['https-url'] = https_har.url
+    if http_har:
+        profile['base-url'] = http_har.url.split('://')[1]
+    else:
+        profile['base-url'] = https_har.url.split('://')[1]
+    if http_har: profile['http-url'] = http_har.url
+    if https_har: profile['https-url'] = https_har.url
 
     ##
     ## Number of objects loaded with HTTP and HTTPS for each version
     ##
-    profile['http-protocol-counts'] = [['HTTP', http_har.num_http_objects],
-                                       ['HTTPS', http_har.num_https_objects]]
-    profile['https-protocol-counts'] = [['HTTP', https_har.num_http_objects],
-                                        ['HTTPS', https_har.num_https_objects]]
+    if http_har:
+        profile['http-protocol-counts'] = [['HTTP', http_har.num_http_objects],
+                                           ['HTTPS', http_har.num_https_objects]]
+    if https_har:
+        profile['https-protocol-counts'] = [['HTTP', https_har.num_http_objects],
+                                            ['HTTPS', https_har.num_https_objects]]
 
     ##
     ## Object details
     ##
-    profile['object-details'] = []
-    objects, _, _ = compare_objects(http_har, https_har)
-    for obj in objects:
-        d = dict(objects[obj])  # make a copy of the dict
-        d['filename'] = obj if obj != '' else '/'
-        profile['object-details'].append(d)
+    if http_har and https_har:
+        profile['object-details'] = []
+        objects, _, _ = compare_objects(http_har, https_har)
+        for obj in objects:
+            d = dict(objects[obj])  # make a copy of the dict
+            d['filename'] = obj if obj != '' else '/'
+            profile['object-details'].append(d)
 
     ##
     ## Save as JSON
     ##
-    filename = '%s.json' % Har.sanitize_url(http_har.url.split('://')[1])
+    filename = None
+    if http_har:
+        filename = '%s.json' % Har.sanitize_url(http_har.url.split('://')[1])
+    else:
+        filename = '%s.json' % Har.sanitize_url(https_har.url.split('://')[1])
     filepath = os.path.join(outdir, filename)
     with open(filepath, 'w') as f:
         json.dump(profile, f)
@@ -351,8 +328,7 @@ def main():
             logging.debug('Har path: %s' % http_path)
             # load HAR
             http_har = Har.from_file(http_path)
-            # save an individual profile
-            save_http_profile(http_har, profile_dir())
+            save_profile(http_har, None, profile_dir())
             
             ##
             ## global summary stats
@@ -367,8 +343,7 @@ def main():
             logging.debug('Har path: %s' % https_path)
             # load HAR
             https_har = Har.from_file(https_path)
-            # save an individual profile
-            save_https_profile(https_har, profile_dir())
+            save_profile(None, https_har, profile_dir())
             
             ##
             ## global summary stats
@@ -385,8 +360,6 @@ def main():
             # load both HARs
             http_har = Har.from_file(http_path)
             https_har = Har.from_file(https_path)
-
-            # save an individual profile
             save_profile(http_har, https_har, profile_dir())
 
             ##
