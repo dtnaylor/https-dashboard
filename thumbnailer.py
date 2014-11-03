@@ -37,8 +37,7 @@ def process_image_file(image_file):
     thumb_name = '%s-%s_thumb%s' % (site, protocol, ext)
     thumb_path = os.path.join(img_dir, thumb_name)
 
-    #os.rename(image_file, img_path)
-    img_path=image_file  # TODO remove
+    os.rename(image_file, img_path)
 
     # now prepare thumbnail
     im = Image.open(img_path)
