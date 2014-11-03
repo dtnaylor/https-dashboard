@@ -7,3 +7,4 @@
 - manager should call har_gen + profiler as python functions, not processes
 - why does phantomjs phantomloader.js https://digg.com /tmp/HAR /tmp/PNG 30 fail?
 - loading profile: make sure it works even if only HTTP or HTTPS is there
+- finish switch to main manifest and crawl manifest
