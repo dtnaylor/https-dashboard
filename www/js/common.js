@@ -100,10 +100,6 @@ $(function () {
 	load_manifest(profile_dir + 'manifest.json');
 
 	// load user agent menu
-	if (!Storage.exists('current-user-agent')) {
-		Storage.set('current-user-agent', 'default');
-	}
-	set_user_agent_display(Storage.get('current-user-agent'));
 	user_agents = Storage.get('manifest')['user-agents'];
 	user_agent_menu = document.getElementById("user-agent-menu");
 	for (var user_agent in user_agents) {
@@ -113,6 +109,15 @@ $(function () {
 			+ '</a></li>'
 			+ user_agent_menu.innerHTML;
 	}
+	if (!Storage.exists('current-user-agent')) {
+		// if there's no stored user agent, pick a random one
+		// TODO: manifest should tell default user agent?
+		for (var user_agent in user_agents) {
+			Storage.set('current-user-agent', user_agent);
+			break;
+		}
+	}
+	set_user_agent_display(Storage.get('current-user-agent'));
 
 	// call page-specific main()
 	main(profile_dir, Storage.get('current-user-agent'));
