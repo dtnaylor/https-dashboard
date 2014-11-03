@@ -209,6 +209,7 @@ def save_profile(http_har, https_har, outdir):
     ## URLs
     ##
     if http_har:
+        print http_har.url
         profile['base-url'] = http_har.url.split('://')[1]
     else:
         profile['base-url'] = https_har.url.split('://')[1]

@@ -4,4 +4,6 @@
 - think about what should be local storage vs. session storage
 - file path manipulation library?
 - check reliability of protocol availability
-- refactor profiler.py: if only available over HTTP or HTTPS, still output as much info as possible
+- manager should call har_gen + profiler as python functions, not processes
+- why does phantomjs phantomloader.js https://digg.com /tmp/HAR /tmp/PNG 30 fail?
+- loading profile: make sure it works even if only HTTP or HTTPS is there
