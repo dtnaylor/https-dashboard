@@ -5,3 +5,4 @@
 - check reliability of protocol availability
 - manager should call har_gen + profiler as python functions, not processes
 - loading profile: make sure it works even if only HTTP or HTTPS is there
+- bug with link to full size screenshots
