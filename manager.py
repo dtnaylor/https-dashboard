@@ -40,8 +40,9 @@ USER_AGENTS={
 #}
 TEMPDIR=os.path.join(tempfile.gettempdir(), 'https-dashboard')
 OUTDIR='./profiles'
-WEB_SERVER='linux.gp.cs.cmu.edu'
-WEB_SERVER_DIR='/afs/cs.cmu.edu/project/httpsdashboard'
+#WEB_SERVER='linux.gp.cs.cmu.edu'
+WEB_SERVER='linuxgp'
+WEB_SERVER_DIR='/afs/cs.cmu.edu/project/httpsdashboard/www'
 
 OUT_SUBDIR = None
 
@@ -166,6 +167,7 @@ def main():
 
         if today not in main_manifest['dates']:
             main_manifest['dates'].append(today)
+        main_manifest['dates'] = sorted(main_manifest['dates'], reverse=True)
 
         with open(main_manifest_file, 'w') as f:
             json.dump(main_manifest, f)
@@ -179,13 +181,13 @@ def main():
     ## Copy files to web server
     ##
     # TODO: test
-    #try:
-    #    rsync_cmd = '%s -avz %s %s:%s' %\
-    #        (RSYNC, OUTDIR, WEB_SERVER, WEB_SERVER_DIR)
-    #    logging.debug('Running rsync: %s', rsync_cmd)
-    #    subprocess.check_call(rsync_cmd.split())
-    #except:
-    #    logging.exception('Error copying profiles to web server')
+    try:
+        rsync_cmd = '%s -avz %s %s:%s' %\
+            (RSYNC, OUTDIR, WEB_SERVER, WEB_SERVER_DIR)
+        logging.debug('Running rsync: %s', rsync_cmd)
+        subprocess.check_call(rsync_cmd.split())
+    except:
+        logging.exception('Error copying profiles to web server')
 
     
     logging.info('Done.')
