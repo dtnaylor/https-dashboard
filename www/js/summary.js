@@ -1,12 +1,12 @@
 /*
  * MAIN
  */
-function main(profile_dir, user_agent) {
-	load_basic_stats(profile_dir, user_agent, 'sort-alpha');
-	load_protocol_counts(profile_dir, user_agent, 'http', 'sort-alpha');
-	load_protocol_counts(profile_dir, user_agent, 'https', 'sort-alpha');
+function main() {
+	load_basic_stats('sort-alpha');
+	load_protocol_counts('http', 'sort-alpha');
+	load_protocol_counts('https', 'sort-alpha');
 
-	$.getJSON(profile_dir + user_agent + '/summary.json', function(data) {
+	$.getJSON(get_summary_json_path(), function(data) {
 		/*
 		 *  Protocol availability
 		 */
@@ -41,16 +41,16 @@ function main(profile_dir, user_agent) {
 	});
 }
 
-function load_basic_stats(profile_dir, user_agent, sort) {
+function load_basic_stats(sort) {
 	var basic_stats = ["num_objects", "num_tcp_handshakes", "num_mbytes", "num_hosts"];
 	basic_stats.forEach(function(stat) {
-		load_basic_stat(profile_dir, user_agent, stat, sort);
-		load_basic_stat_diff(profile_dir, user_agent, stat, sort);
+		load_basic_stat(stat, sort);
+		load_basic_stat_diff(stat, sort);
 	});
 }
 
-function load_protocol_counts(profile_dir, user_agent, site, sort) {
-	$.getJSON(profile_dir + user_agent + '/summary.json', function(data) {
+function load_protocol_counts(site, sort) {
+	$.getJSON(get_summary_json_path(), function(data) {
 		/*
 		 * protocol count stack plots
 		 */
@@ -119,8 +119,8 @@ ylabels["num_tcp_handshakes"] = "Number of TCP Connections";
 ylabels["num_mbytes"] = "Total Size (MB)";
 ylabels["num_hosts"] = "Number of Hosts";
 
-function load_basic_stat(profile_dir, user_agent, stat, sort) {
-	$.getJSON(profile_dir + user_agent + '/summary.json', function(data) {
+function load_basic_stat(stat, sort) {
+	$.getJSON(get_summary_json_path(), function(data) {
     	$('#'+stat).highcharts({
     	    chart: {
     	        type: 'area'
@@ -200,8 +200,8 @@ function assign_threshold_colors(data, threshold) {
 	return colored_data;
 }
 
-function load_basic_stat_diff(profile_dir, user_agent, stat, sort) {
-	$.getJSON(profile_dir + user_agent + '/summary.json', function(data) {
+function load_basic_stat_diff(stat, sort) {
+	$.getJSON(get_summary_json_path(), function(data) {
     	$('#'+stat+"-diff").highcharts({
     	    chart: {
     	        type: 'column'

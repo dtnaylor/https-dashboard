@@ -57,8 +57,17 @@
 
 	  	<!-- CONTROL MENUS (right) -->
 	      <ul class="nav navbar-nav navbar-right">
-	  	  <!-- USER AGENT -->
-	  	  <li><p class="navbar-text">User Agent:</p></li>
+	  	    <!-- CRAWL DATE -->
+	  	    <li style="border-left: 1px solid #e1e1e1;"><p class="navbar-text" style="margin-right: 0px;"><strong>Crawl Date:</strong></p></li>
+	        <li class="dropdown">
+	          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="crawl-date-display">Date</span> <span class="caret"></span></a>
+	          <ul class="dropdown-menu" role="menu" id="crawl-date-menu">
+	  		  <!-- to be filled in programatically on page load -->
+	          </ul>
+	        </li> <!-- user agent dropdown -->
+
+	  	    <!-- USER AGENT -->
+	  	    <li style="border-left: 1px solid #e1e1e1;"><p class="navbar-text" style="margin-right: 0px;"><strong>User Agent:</strong></p></li>
 	        <li class="dropdown">
 	          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="user-agent-display">User Agent</span> <span class="caret"></span></a>
 	          <ul class="dropdown-menu" role="menu" id="user-agent-menu">
@@ -66,7 +75,8 @@
 	            <li class="divider"></li>
 	            <li><a href="user_agents.html">Details</a></li>
 	          </ul>
-	        </li>
+	        </li> <!-- user agent dropdown -->
+
 	      </ul>
 	    </div><!-- /.navbar-collapse -->
 	  </div><!-- /.container-fluid -->
@@ -96,12 +106,13 @@
 			</div> <!-- URL column -->
 		
 		
-			<div class="col-md-2">
+			<!-- thumbnails start invisible, become visible when we load image -->
+			<div class="col-md-2" id="http-site-thumbnail-container" style="visibility: hidden;">
 				<a id=http-screenshot-link><img id="http-site-thumbnail" class="img-thumbnail"/></a>
 				<h4 style="text-align: center;">HTTP</h4>
 			</div> <!-- HTTP thumbnail column -->
 
-			<div class="col-md-2">
+			<div class="col-md-2" id="https-site-thumbnail-container" style="visibility: hidden;">
 				<a id=https-screenshot-link><img id="https-site-thumbnail" class="img-thumbnail"/></a>
 				<h4 style="text-align: center;">HTTPS</h4>
 			</div> <!-- HTTPS thumbnail column -->

@@ -1,8 +1,8 @@
 /*
  * MAIN
  */
-function main(profile_dir, user_agent) {
-	user_agents = Storage.get('manifest')['user-agents'];
+function main() {
+	user_agents = Storage.get('crawl-manifest')['user-agents'];
 	table = document.getElementById('user-agent-table');
 
 	for (var user_agent in user_agents) {

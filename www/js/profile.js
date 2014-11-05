@@ -176,12 +176,12 @@ function make_stacked_bar(id, title, ylabel, tooltip_postfix, stacking, categori
 /*
  * metric is either 'count' or 'size'
  */
-function load_object_type_breakdown(profile_dir, user_agent, metric, stacking) {
+function load_object_type_breakdown(metric, stacking) {
 	// Get the path to the site's JSON profile
 	var params = getSearchParameters();
 	if (!params.hasOwnProperty("site")) return -1;
 
-	$.getJSON(get_profile(profile_dir, user_agent, params["site"]), function(data) {
+	$.getJSON(get_profile_path(params["site"]), function(data) {
 		/*
 		 * Object Type Bars
 		 */
@@ -211,18 +211,40 @@ function load_object_type_breakdown(profile_dir, user_agent, metric, stacking) {
 
 
 
+/*
+ * Attempt to load an image. If successful, set the image as the src of the
+ * supplied image element. If not successful, hide the element_to_hide
+ * (which is typically the image element or a container of the image element).
+ */
+// TODO: this doesn't fetch the image twice, does it?
+function load_image_or_hide(image_url, image_element, element_to_hide) {
+	var img = new Image();
+	img.onload = function() {
+		image_element.src = this.src;
+		element_to_hide.style.visibility = 'visible';
+		//element_to_hide.style.display = 'inline';
+	};
+
+	img.onerror = function() {
+		element_to_hide.style.visibility = 'hidden';
+		//element_to_hide.style.display = 'none';
+	};
+
+	img.src = image_url;
+}
+
+
 
 
 
 /* 
  * MAIN
  */
-function main(profile_dir, user_agent) {
+function main() {
 	var params = getSearchParameters();
 	if (!params.hasOwnProperty("site")) return -1;
 
-	$.getJSON(get_profile(profile_dir, user_agent, params["site"]), function(data) {
-		console.log(data);
+	$.getJSON(get_profile_path(params["site"]), function(data) {
 
 		/*
 		 * Site URL
@@ -232,11 +254,16 @@ function main(profile_dir, user_agent) {
 		/*
 		 * Site thumbnails
 		 */
-		// TODO: handle non-existent screenshots
-		document.getElementById("http-site-thumbnail").src = get_thumbnail(profile_dir, user_agent, params["site"], 'http');
-		document.getElementById("https-site-thumbnail").src = get_thumbnail(profile_dir, user_agent, params["site"], 'https');
-		document.getElementById("http-screenshot-link").href = get_screenshot(profile_dir, user_agent, params["site"], 'http');
-		document.getElementById("https-screenshot-link").href = get_screenshot(profile_dir, user_agent, params["site"], 'https');
+		load_image_or_hide(get_thumbnail_path(params["site"], 'http'),
+						   document.getElementById("http-site-thumbnail"),
+						   document.getElementById("http-site-thumbnail-container"));
+
+		load_image_or_hide(get_thumbnail_path(params["site"], 'https'),
+						   document.getElementById("https-site-thumbnail"),
+						   document.getElementById("https-site-thumbnail-container"));
+
+		document.getElementById("http-screenshot-link").href = get_screenshot_path(params["site"], 'http');
+		document.getElementById("https-screenshot-link").href = get_screenshot_path(params["site"], 'https');
 
 
 		/*
@@ -402,5 +429,5 @@ function main(profile_dir, user_agent) {
 		error_alert.style.display = "inherit";
 	});
 
-	load_object_type_breakdown(profile_dir, user_agent, 'count', 'normal');
+	load_object_type_breakdown('count', 'normal');
 }
