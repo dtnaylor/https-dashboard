@@ -52,13 +52,8 @@ function only_both(sites) {
 /* 
  * MAIN
  */
-function main(profile_dir, user_agent) {
-	console.log('main; user agent: ' + user_agent);
-	summary_path = profile_dir + user_agent + '/summary.json';
-	$.getJSON(summary_path, function(data) {
-		console.log('summary path: ' + summary_path);
-		console.log('loaded site json!');
-		console.log(only_both(data["sites"]));
+function main() {
+	$.getJSON(get_summary_json_path(), function(data) {
 		/*
 		 * Site URL list
 		 */
@@ -72,12 +67,10 @@ function main(profile_dir, user_agent) {
 		  }
 		});
 		var dynatable = $('#site-table').data('dynatable');
-		//console.log(dynatable);
 		
 		dynatable.paginationPerPage.set(100); // Show 100 records per page
 		dynatable.process(true);  // true means don't change URL so back changes table
 		
-		console.log('done processing');
 
 
 		//var tbl_body = "";
