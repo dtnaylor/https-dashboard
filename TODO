@@ -1,3 +1,4 @@
+- Write manager config parser
 - about page
 - HTTPS explanations
 - think about what should be local storage vs. session storage

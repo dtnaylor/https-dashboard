@@ -16,19 +16,26 @@ import shutil
 import datetime
 import json
 
+from logging import handlers
+
 import thumbnailer
 
+# tools
+ALEXA_URL_FETCHER = './alexa_top_sites.py'
+URL_PREPARER = './prepare_url_list.py'
 HAR_GENERATOR = './web-profiler/tools/har_generator.py'
 SCREENSHOT_GENERATOR = './web-profiler/tools/screenshot_generator.py'
 PROFILER = './profiler.py'
 RSYNC = '/usr/bin/env rsync'
 
+
+# configuration
 # TODO: put these in conf file
 MANAGER_LOG='./logs/manager.log'
 HAR_GENERATOR_LOG='./logs/har_generator.log'
 PROFILER_LOG='./logs/profiler.log'
 
-URL_FILE='./web-profiler/tools/tmp_urls'
+URL_FILE=None #'./web-profiler/tools/tmp_urls'
 USER_AGENTS={
     'chrome-37-osx':
        {'name': 'Chrome 37 (OSX)', 'string': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36'},
@@ -48,6 +55,7 @@ OUT_SUBDIR = None
 
 
 def main():
+    global URL_FILE
 
     ##
     ## Prepare temp directories
@@ -102,6 +110,32 @@ def main():
         logging.exception('Error preparing output directory')
         sys.exit(-1)
 
+
+
+    ##
+    ## Prepare URL list
+    ##
+    if not URL_FILE:
+        try:
+            alexa_url_list = '%s/alexa_url_list.txt' % TEMPDIR
+            prepared_url_list = '%s/prepared_url_list.txt' % TEMPDIR
+
+            # Get top 500 Alexa URLs
+            # TODO: top 500
+            alexa_cmd = '%s -n 10 > %s' % (ALEXA_URL_FETCHER, alexa_url_list)
+            logging.info('Getting Alexa URLs: %s' % alexa_cmd)
+            subprocess.check_call(alexa_cmd, shell=True)  # TODO: careful!
+
+            # Make a file with the HTTP and HTTPS versions of those URLs
+            prepare_cmd = '%s %s %s' %\
+                (URL_PREPARER, alexa_url_list, prepared_url_list)
+            logging.info('Preparing URL list: %s' % prepare_cmd)
+            subprocess.check_call(prepare_cmd.split())
+
+            URL_FILE = prepared_url_list
+        except:
+            logging.exception('Error preparing URL list')
+            sys.exit(-1)
 
 
     ##
@@ -217,6 +251,26 @@ if __name__ == "__main__":
         'level' : level
     }
     logging.basicConfig(**config)
+
+    # email me on error or exception
+    # TODO: cleanup
+    smtp_conf = None
+    with open('smtp.conf', 'r') as f:
+        data = f.read()
+        smtp_conf = eval(data)
+    f.closed
+
+    email_handler = handlers.SMTPHandler(\
+        smtp_conf['server'], 'dtbn07@gmail.com',\
+        ['dtbn07@gmail.com'], 'HTTPS Dashboard Error',\
+        credentials=smtp_conf['credentials'], secure=())
+    email_handler.setLevel(logging.ERROR)
+    logging.getLogger('').addHandler(email_handler)
+
+    logging.info('Test Info')
+    logging.error('Test error')
+    sys.exit()
+
     logging.info('=============== MANAGER LAUNCHED ===============')
     
     main()

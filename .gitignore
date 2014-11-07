@@ -57,3 +57,7 @@ docs/_build/
 
 # OSX
 *.DS_Store
+
+# Other
+smtp.conf
+profiles
