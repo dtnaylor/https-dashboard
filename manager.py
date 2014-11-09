@@ -56,6 +56,7 @@ OUT_SUBDIR = None
 
 def main():
     global URL_FILE
+    logging.info('=============== MANAGER LAUNCHED ===============')
 
     ##
     ## Prepare temp directories
@@ -142,15 +143,16 @@ def main():
     ## Generate profiles
     ##
     for user_agent_tag in USER_AGENTS:
+        logging.info('Generating profiles for user agent: %s' % user_agent_tag)
         try:
 
             ##
             ## STAGE ONE: Generate HARs and screenshots for the URLs
             ##
             uagent_tmpdir = os.path.join(TEMPDIR, user_agent_tag)
-            har_cmd = '%s -f %s -o %s -g %s' %\
+            har_cmd = '%s -f %s -o %s -g %s -v' %\
                 (HAR_GENERATOR, URL_FILE, uagent_tmpdir, HAR_GENERATOR_LOG)
-            screenshot_cmd = '%s -f %s -o %s -g %s' %\
+            screenshot_cmd = '%s -f %s -o %s -g %s -v' %\
                 (SCREENSHOT_GENERATOR, URL_FILE, uagent_tmpdir, HAR_GENERATOR_LOG)
             if USER_AGENTS[user_agent_tag]['string']:
                 har_cmd += ' -u "%s"' % USER_AGENTS[user_agent_tag]['string']
@@ -184,7 +186,7 @@ def main():
     ##
     ## Delete temp directories
     ##
-    shutil.rmtree(TEMPDIR)
+    #shutil.rmtree(TEMPDIR)
 
     ##
     ## If successful, update main manifest
@@ -267,10 +269,5 @@ if __name__ == "__main__":
     email_handler.setLevel(logging.ERROR)
     logging.getLogger('').addHandler(email_handler)
 
-    logging.info('Test Info')
-    logging.error('Test error')
-    sys.exit()
-
-    logging.info('=============== MANAGER LAUNCHED ===============')
     
     main()
