@@ -75,22 +75,32 @@
 	<div class="container">
 
 	<div class="page-header">
-	  <h1>Sites</h1>
+	  <h1>Sites
+			<!-- support filter button group -->
+			<div class="btn-group pull-right">
+			  <button id="btn-filter-all" type="button" class="btn btn-default"
+			  	onclick="set_site_list_filter('filter-all')">All Sites</button>
+			  <button id="btn-filter-both" type="button" class="btn btn-default"
+			  	onclick="set_site_list_filter('filter-both')">Support Both</button>
+			</div>
+	  </h1>
 	</div> <!-- page-header -->
 	
 
 	<!-- SITES -->
 	<div class="row">
 		<div class="col-md-12">
+
+			<!-- TABLE -->
 			<table id="site-table" class="table table-hover" style="width:100%; table-layout:fixed;">
 				<thead>
 					<th><span style="color:#333333">Site (click URL for more details)</span></th>
-					<th data-dynatable-sorts="supportSort"><span style="color:#333333">HTTPS Support</span></th>
+					<th data-dynatable-sorts="supportSort"><span style="color:#333333">Protocol Support</span></th>
 					<th style="display:none">Support Sort</th>
 				</thead>
-
 				<tbody id="site-table-body"></tbody>
 			</table>
+
 		</div>  <!-- object details -->
 	</div> <!-- row -->
 

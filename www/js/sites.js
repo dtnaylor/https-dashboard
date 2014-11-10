@@ -36,7 +36,11 @@ function ulWriter(rowIndex, record, columns, cellWriter) {
 }
 
 
-function only_both(sites) {
+function filter_all(sites) {
+	return sites;
+}
+
+function filter_both(sites) {
 	var new_sites = [];
 
 	for (i=0; i < sites.length; i++) {
@@ -49,10 +53,27 @@ function only_both(sites) {
 }
 
 
-/* 
- * MAIN
- */
-function main() {
+function set_site_list_filter(filter) {
+	Storage.set('site-list-filter', filter);
+	location.reload();
+}
+
+function load_table(filter) {
+
+	// highlight the correct filter button and pick filter function
+	var filter_func = null;
+	$("#btn-filter-all").removeClass('active');
+	$("#btn-filter-both").removeClass('active');
+	if (filter == "filter-all") {
+		$("#btn-filter-all").addClass('active');
+		filter_func = filter_all;
+	} else if (filter == "filter-both") {
+		$("#btn-filter-both").addClass('active');
+		filter_func = filter_both;
+	}
+
+
+	// reload site list with new filter
 	$.getJSON(get_summary_json_path(), function(data) {
 		/*
 		 * Site URL list
@@ -63,7 +84,7 @@ function main() {
 		    _rowWriter: ulWriter
 		  },
 		  dataset: {
-		    records: only_both(data["sites"])   // TODO: temporary
+		    records: filter_func(data["sites"])
 		  }
 		});
 		var dynatable = $('#site-table').data('dynatable');
@@ -81,4 +102,16 @@ function main() {
 		//})
 		//$("#site-table tbody").html(tbl_body);
 	});
+}
+
+
+/* 
+ * MAIN
+ */
+function main() {
+	var filter = "filter-all";
+	if (Storage.exists('site-list-filter')) {
+		filter = Storage.get('site-list-filter');
+	}
+	load_table(filter);
 }

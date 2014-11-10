@@ -92,7 +92,7 @@ function get_thumbnail_path(site, protocol) {
 /*
  * Return the path to the screenshot for a given site
  */
-function get_screenshot_path(profile_dir, user_agent, site, protocol) {
+function get_screenshot_path(site, protocol) {
 	return get_selected_dir() + '/site_screenshots/' + site + '-' 
 		+ protocol + '.png';
 }
