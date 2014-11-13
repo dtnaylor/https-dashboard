@@ -54,7 +54,7 @@ function filter_both(sites) {
 
 
 function set_site_list_filter(filter) {
-	Storage.set('site-list-filter', filter);
+	LocalStorage.set('site-list-filter', filter);
 	location.reload();
 }
 
@@ -110,8 +110,8 @@ function load_table(filter) {
  */
 function main() {
 	var filter = "filter-all";
-	if (Storage.exists('site-list-filter')) {
-		filter = Storage.get('site-list-filter');
+	if (LocalStorage.exists('site-list-filter')) {
+		filter = LocalStorage.get('site-list-filter');
 	}
 	load_table(filter);
 }

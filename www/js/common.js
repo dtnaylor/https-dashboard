@@ -3,7 +3,7 @@
 /*
  * Wrapper for localStorage
  */
-var Storage = {
+var LocalStorage = {
 	set: function(key, value) {
 		key = 'edu.cmu.cs.httpsdashboard.' + key;
 		localStorage[key] = JSON.stringify(value);
@@ -21,6 +21,26 @@ var Storage = {
 };
 
 /*
+ * Wrapper for sessionStorage
+ */
+var SessionStorage = {
+	set: function(key, value) {
+		key = 'edu.cmu.cs.httpsdashboard.' + key;
+		sessionStorage[key] = JSON.stringify(value);
+	},
+
+	get: function(key) {
+		key = 'edu.cmu.cs.httpsdashboard.' + key;
+		return sessionStorage[key] ? JSON.parse(sessionStorage[key]) : null;
+	},
+
+	exists: function(key) {
+		key = 'edu.cmu.cs.httpsdashboard.' + key;
+		return sessionStorage[key] != null;
+	},
+};
+
+/*
  * Load a JSON file and store in local storage
  */
 function load_json(json_path, key) {
@@ -30,7 +50,7 @@ function load_json(json_path, key) {
 	  dataType: 'json',
 	  async: false,
 	  success: function(data) {
-		Storage.set(key, data);
+		LocalStorage.set(key, data);
 	  }
 	});
 }
@@ -41,9 +61,9 @@ function load_json(json_path, key) {
  * Return the path to the current profile directory
  */
 function get_selected_dir() {
-	profile_dir = Storage.get('profile-dir');
-	crawl_date = Storage.get('selected-crawl-date');
-	user_agent = Storage.get('selected-user-agent');
+	profile_dir = LocalStorage.get('profile-dir');
+	crawl_date = SessionStorage.get('selected-crawl-date');
+	user_agent = LocalStorage.get('selected-user-agent');
 
 	return profile_dir + '/' 
 		 + crawl_date + '/'
@@ -54,7 +74,7 @@ function get_selected_dir() {
  * Return the path to the main manifest
  */
 function get_main_manifest_path() {
-	profile_dir = Storage.get('profile-dir');
+	profile_dir = LocalStorage.get('profile-dir');
 	return profile_dir + '/main-manifest.json';
 }
 
@@ -62,8 +82,8 @@ function get_main_manifest_path() {
  * Return the path to the crawl manifest for the selected date
  */
 function get_crawl_manifest_path() {
-	profile_dir = Storage.get('profile-dir');
-	crawl_date = Storage.get('selected-crawl-date');
+	profile_dir = LocalStorage.get('profile-dir');
+	crawl_date = SessionStorage.get('selected-crawl-date');
 	return profile_dir + crawl_date + '/crawl-manifest.json';
 }
 
@@ -103,7 +123,7 @@ function get_screenshot_path(site, protocol) {
  * Set the displayed user agent name
  */
 function set_crawl_date_display(crawl_date) {
-	crawl_manifest = Storage.get('crawl-manifest');
+	crawl_manifest = LocalStorage.get('crawl-manifest');
 	display = document.getElementById("crawl-date-display");
 	display.innerHTML = crawl_date; // TODO: pretty format?
 }
@@ -112,7 +132,7 @@ function set_crawl_date_display(crawl_date) {
  * Set the displayed user agent name
  */
 function set_user_agent_display(user_agent) {
-	crawl_manifest = Storage.get('crawl-manifest');
+	crawl_manifest = LocalStorage.get('crawl-manifest');
 	display = document.getElementById("user-agent-display");
 	display.innerHTML = crawl_manifest["user-agents"][user_agent]["name"];
 }
@@ -122,7 +142,7 @@ function set_user_agent_display(user_agent) {
  */
 function change_crawl_date(crawl_date) {
 	console.log('changing crawl_date to: ' + crawl_date);
-	Storage.set('selected-crawl-date', crawl_date);
+	SessionStorage.set('selected-crawl-date', crawl_date);
 	set_crawl_date_display(crawl_date);
 
 	// reload page data
@@ -131,7 +151,7 @@ function change_crawl_date(crawl_date) {
 	//console.log(dynatable);
 	//dynatable.records.resetOriginal();
 	//document.getElementById("site-table-body").innerHTML = '';
-	//main(Storage.get('profile-dir'), user_agent);
+	//main(LocalStorage.get('profile-dir'), user_agent);
 
 	// FIXME: something better
 	location.reload();
@@ -144,7 +164,7 @@ function change_crawl_date(crawl_date) {
  */
 function change_user_agent(user_agent) {
 	console.log('changing user agent to: ' + user_agent);
-	Storage.set('selected-user-agent', user_agent);
+	LocalStorage.set('selected-user-agent', user_agent);
 	set_user_agent_display(user_agent);
 
 	// reload page data
@@ -153,7 +173,7 @@ function change_user_agent(user_agent) {
 	//console.log(dynatable);
 	//dynatable.records.resetOriginal();
 	//document.getElementById("site-table-body").innerHTML = '';
-	//main(Storage.get('profile-dir'), user_agent);
+	//main(LocalStorage.get('profile-dir'), user_agent);
 
 	// FIXME: something better
 	location.reload();
@@ -169,7 +189,7 @@ $(function () {
 	// DATA DIRECTORY
 	//
 	var profile_dir = './profiles/';
-	Storage.set('profile-dir', profile_dir);
+	LocalStorage.set('profile-dir', profile_dir);
 
 
 
@@ -179,14 +199,14 @@ $(function () {
 	load_json(get_main_manifest_path(), 'main-manifest');
 
 	// get last crawl date
-	main_manifest = Storage.get('main-manifest');
+	main_manifest = LocalStorage.get('main-manifest');
 	crawl_dates = main_manifest['dates']
-	if (!Storage.exists('selected-crawl-date')) {
+	if (!SessionStorage.exists('selected-crawl-date')) {
 		// if there's no stored crawl date, pick most recent
 		first_date = crawl_dates[0]
-		Storage.set('selected-crawl-date', first_date);
+		SessionStorage.set('selected-crawl-date', first_date);
 	}
-	set_crawl_date_display(Storage.get('selected-crawl-date'));
+	set_crawl_date_display(SessionStorage.get('selected-crawl-date'));
 
 	// load crawl date menu
 	crawl_date_menu = document.getElementById("crawl-date-menu");
@@ -207,16 +227,16 @@ $(function () {
 	load_json(get_crawl_manifest_path(), 'crawl-manifest');
 
 	// load last user agent
-	user_agents = Storage.get('crawl-manifest')['user-agents'];
-	if (!Storage.exists('selected-user-agent')) {
+	user_agents = LocalStorage.get('crawl-manifest')['user-agents'];
+	if (!LocalStorage.exists('selected-user-agent')) {
 		// if there's no stored user agent, pick a random one
 		// TODO: crawl manifest should tell default user agent?
 		for (var user_agent in user_agents) {
-			Storage.set('selected-user-agent', user_agent);
+			LocalStorage.set('selected-user-agent', user_agent);
 			break;
 		}
 	}
-	set_user_agent_display(Storage.get('selected-user-agent'));
+	set_user_agent_display(LocalStorage.get('selected-user-agent'));
 	
 	// load user agent menu
 	user_agent_menu = document.getElementById("user-agent-menu");

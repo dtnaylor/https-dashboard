@@ -121,6 +121,7 @@ ylabels["num_hosts"] = "Number of Hosts";
 
 function load_basic_stat(stat, sort) {
 	$.getJSON(get_summary_json_path(), function(data) {
+		console.log(data);
     	$('#'+stat).highcharts({
     	    chart: {
     	        type: 'area'
