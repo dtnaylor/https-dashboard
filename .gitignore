@@ -61,3 +61,5 @@ docs/_build/
 # Other
 smtp.conf
 profiles
+test.conf
+test.urls
