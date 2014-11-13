@@ -353,7 +353,6 @@ function main() {
 		/*
 		 * Object origin details
 		 */
-		console.log(data["object-details"]);
 		var tbl_body = "";
 		$.each(data["object-details"], function() {
 		    var tbl_row = "";
