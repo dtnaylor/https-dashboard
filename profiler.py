@@ -138,20 +138,20 @@ def print_table(objects, har1, har2):
     print '='*width
 
 
-def compare_objects(har1, har2, do_print=False):
+def compare_objects(http_har, https_har, do_print=False):
 
     # filename -> har url -> origin server
     # filename -> 'status' -> ObjectStatus
     objects = defaultdict(lambda: defaultdict(str))
-    http_har = get_http_har(har1, har2)
-    https_har = get_https_har(har1, har2)
 
-    for obj in http_har.objects:
-        objects[obj.filename]['http-origin'] = obj.host
-        objects[obj.filename]['http-protocol'] = obj.protocol
-    for obj in https_har.objects:
-        objects[obj.filename]['https-origin'] = obj.host
-        objects[obj.filename]['https-protocol'] = obj.protocol
+    if http_har:
+        for obj in http_har.objects:
+            objects[obj.filename]['http-origin'] = obj.host
+            objects[obj.filename]['http-protocol'] = obj.protocol
+    if https_har:
+        for obj in https_har.objects:
+            objects[obj.filename]['https-origin'] = obj.host
+            objects[obj.filename]['https-protocol'] = obj.protocol
 
     # count number of different objects and origin domains
     counts = defaultdict(int)
@@ -229,13 +229,13 @@ def save_profile(http_har, https_har, outdir):
     ##
     ## Object details
     ##
-    if http_har and https_har:
-        profile['object-details'] = []
-        objects, _, _ = compare_objects(http_har, https_har)
-        for obj in objects:
-            d = dict(objects[obj])  # make a copy of the dict
-            d['filename'] = obj if obj != '' else '/'
-            profile['object-details'].append(d)
+    #if http_har and https_har:
+    profile['object-details'] = []
+    objects, _, _ = compare_objects(http_har, https_har)
+    for obj in objects:
+        d = dict(objects[obj])  # make a copy of the dict
+        d['filename'] = obj if obj != '' else '/'
+        profile['object-details'].append(d)
 
     ##
     ## Save as JSON
