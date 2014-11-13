@@ -68,13 +68,15 @@ function dicts_to_pie_data(dict1, dict2) {
 /*
  * PLOTTING FUNCTIONS
  */
-function make_pie_chart(id, title, data, tooltip_postfix) {
+function make_pie_chart(id, title, data, tooltip_postfix, margin, series_name) {
+	margin = margin ? margin : [25, 25, 40, 25];
+
     $(id).highcharts({
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
             plotShadow: false,
-			margin: [25, 25, 40, 25],
+			margin: margin,
         },
         title: {
             text: title
@@ -98,6 +100,7 @@ function make_pie_chart(id, title, data, tooltip_postfix) {
         },
         series: [{
             type: 'pie',
+			name: series_name,
             data: data,
         }]
     });
@@ -185,27 +188,26 @@ function load_object_type_breakdown(metric, stacking) {
 		/*
 		 * Object Type Bars
 		 */
+
+		// if the site doesn't support HTTP or HTTPS, make an empty dict for that protocol
+		var http_num_objects_by_type = data["http-profile"] ? data["http-profile"]["num-objects-by-type"] : {};
+		var https_num_objects_by_type = data["https-profile"] ? data["https-profile"]["num-objects-by-type"] : {};
+		var http_num_bytes_by_type = data["http-profile"] ? data["http-profile"]["num-bytes-by-type"] : {};
+		var https_num_bytes_by_type = data["https-profile"] ? data["https-profile"]["num-bytes-by-type"] : {};
+
 		if (metric == 'count') {
-			var series = dicts_to_stacked_bar_data([data["http-profile"]["num-objects-by-type"],
-													data["https-profile"]["num-objects-by-type"]]);
+			var series = dicts_to_stacked_bar_data([http_num_objects_by_type,
+													https_num_objects_by_type]);
 			var ylabel = stacking == 'normal' ? 'Number of Objects' : 'Percent of Objects';
 			make_stacked_bar('#object-types', null, ylabel, 'objects', stacking, ['HTTP', 'HTTPS'], series);
 		} else if (metric == 'size') {
-			var series = dicts_to_stacked_bar_data([data["http-profile"]["num-bytes-by-type"],
-													data["https-profile"]["num-bytes-by-type"]]);
+			var series = dicts_to_stacked_bar_data([http_num_bytes_by_type,
+													https_num_bytes_by_type]);
 			var ylabel = stacking == 'normal' ? 'Number of Bytes' : 'Percent of Bytes';
 			make_stacked_bar('#object-types', null, ylabel, 'bytes', stacking, ['HTTP', 'HTTPS'], series);
 
 		}
 		
-		/*
-		 * Object Type Pie
-		 */
-		//obj_type_data = dicts_to_pie_data(data["http-profile"]["num-objects-by-type"],
-		//									data["https-profile"]["num-objects-by-type"]);
-		//make_pie_chart('#http-object-types', 'HTTP Site', obj_type_data[0], 'objects');
-		//make_pie_chart('#https-object-types', 'HTTPS Site', obj_type_data[1], 'objects');
-
 	});
 }
 
@@ -269,6 +271,16 @@ function main() {
 		/*
 		 * Bar charts
 		 */
+		// if the site doesn't support HTTP or HTTPS, make an empty array for that protocol
+		var http_num_objects = data["http-profile"] ? data["http-profile"]["num-objects"] : [];
+		var https_num_objects = data["https-profile"] ? data["https-profile"]["num-objects"] : [];
+		var http_num_mbytes = data["http-profile"] ? data["http-profile"]["num-bytes"]/1000000.0 : [];
+		var https_num_mbytes = data["https-profile"] ? data["https-profile"]["num-bytes"]/1000000.0 : [];
+		var http_num_hosts = data["http-profile"] ? data["http-profile"]["num-hosts"] : [];
+		var https_num_hosts = data["https-profile"] ? data["https-profile"]["num-hosts"] : [];
+		var http_num_tcp_handshakes = data["http-profile"] ? data["http-profile"]["num-tcp-handshakes"] : [];
+		var https_num_tcp_handshakes = data["https-profile"] ? data["https-profile"]["num-tcp-handshakes"] : [];
+
 		$('#basic-stats').highcharts({
             chart: {
                 type: 'bar'
@@ -300,10 +312,10 @@ function main() {
             },
             series: [{
                 name: 'HTTP',
-                data: [data["http-profile"]["num-objects"], data["http-profile"]["num-bytes"]/1000000.0, data["http-profile"]["num-hosts"], data["http-profile"]["num-tcp-handshakes"]],
+                data: [http_num_objects, http_num_mbytes, http_num_hosts, http_num_tcp_handshakes],
             }, {
                 name: 'HTTPS',
-                data: [data["https-profile"]["num-objects"], data["https-profile"]["num-bytes"]/1000000.0, data["https-profile"]["num-hosts"], data["https-profile"]["num-tcp-handshakes"]],
+                data: [https_num_objects, https_num_mbytes, https_num_hosts, https_num_tcp_handshakes],
             }]
         });
 
@@ -314,77 +326,34 @@ function main() {
 		/*
 		 * HTTP Protocol Counts Pie
 		 */
-    	$('#http-protocol-counts').highcharts({
-    	    chart: {
-    	        plotBackgroundColor: null,
-    	        plotBorderWidth: null,
-    	        plotShadow: false,
-				margin: [25, 25, 25, 25],
-    	    },
-    	    title: {
-    	        text: 'HTTP Site'
-    	    },
-    	    tooltip: {
-    		    pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.y} objects)</b>'
-    	    },
-    	    plotOptions: {
-    	        pie: {
-    	            allowPointSelect: true,
-    	            cursor: 'pointer',
-    	            dataLabels: {
-    	                enabled: false,
-    	                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-    	                style: {
-    	                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-    	                }
-    	            },
-					showInLegend: true,
-    	        }
-    	    },
-    	    series: [{
-    	        type: 'pie',
-    	        name: 'HTTP Site',
-    	        data: data["http-protocol-counts"]
-    	    }]
-    	});
+		if (data["http-protocol-counts"]) {
+			make_pie_chart('#http-protocol-counts',  // element id
+						   'HTTP Site',  // title
+						   data["http-protocol-counts"],  // data
+						   'objects',  // tooltip postfix
+						   [25, 25, 25, 25],  // margin
+						   'HTTP Site'  // series name
+			);
+		}
 
 
 		/*
 		 * HTTPS Protocol Counts Pie
 		 */
-    	$('#https-protocol-counts').highcharts({
-    	    chart: {
-    	        plotBackgroundColor: null,
-    	        plotBorderWidth: null,
-    	        plotShadow: false,
-				margin: [25, 25, 25, 25],
-    	    },
-    	    title: {
-    	        text: 'HTTPS Site'
-    	    },
-    	    tooltip: {
-    		    pointFormat: '{series.name}: <b>{point.percentage:.1f}% ({point.y} objects)</b>'
-    	    },
-    	    plotOptions: {
-    	        pie: {
-    	            allowPointSelect: true,
-    	            cursor: 'pointer',
-    	            dataLabels: {
-    	                enabled: false,
-    	            },
-					showInLegend: true,
-    	        }
-    	    },
-    	    series: [{
-    	        type: 'pie',
-    	        name: 'HTTPS Site',
-    	        data: data["https-protocol-counts"]
-    	    }]
-    	});
+		if (data["https-protocol-counts"]) {
+			make_pie_chart('#https-protocol-counts',  // element id
+						   'HTTPS Site',  // title
+						   data["https-protocol-counts"],  // data
+						   'objects',  // tooltip postfix
+						   [25, 25, 25, 25],  // margin
+						   'HTTPS Site'  // series name
+			);
+		}
 
 		/*
 		 * Object origin details
 		 */
+		console.log(data["object-details"]);
 		var tbl_body = "";
 		$.each(data["object-details"], function() {
 		    var tbl_row = "";
@@ -425,7 +394,7 @@ function main() {
 	})
 	.fail(function() {  // getting JSON failed
 		error_alert = document.getElementById("error-alert");
-		error_alert.innerHTML = '<strong>Oops!</strong> There was a problem loading the profile for ' + params["site"] + ' with user agent ' + user_agent + '.';
+		error_alert.innerHTML = '<strong>Oops!</strong> We don\'t have data for <i>' + params["site"] + '</i> for the selected crawl date and user agent.';
 		error_alert.style.display = "inherit";
 	});
 
