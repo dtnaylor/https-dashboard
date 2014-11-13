@@ -33,6 +33,7 @@ RSYNC = '/usr/bin/env rsync'
 # TODO: put these in conf file
 MANAGER_LOG='./logs/manager.log'
 HAR_GENERATOR_LOG='./logs/har_generator.log'
+SCREENSHOT_GENERATOR_LOG='./logs/screenshot_generator.log'
 PROFILER_LOG='./logs/profiler.log'
 
 URL_FILE=None #'./web-profiler/tools/tmp_urls'
@@ -123,7 +124,7 @@ def main():
 
             # Get top 500 Alexa URLs
             # TODO: top 500
-            alexa_cmd = '%s -n 10 > %s' % (ALEXA_URL_FETCHER, alexa_url_list)
+            alexa_cmd = '%s -n 1 > %s' % (ALEXA_URL_FETCHER, alexa_url_list)
             logging.info('Getting Alexa URLs: %s' % alexa_cmd)
             subprocess.check_call(alexa_cmd, shell=True)  # TODO: careful!
 
@@ -153,7 +154,7 @@ def main():
             har_cmd = '%s -f %s -o %s -g %s -v' %\
                 (HAR_GENERATOR, URL_FILE, uagent_tmpdir, HAR_GENERATOR_LOG)
             screenshot_cmd = '%s -f %s -o %s -g %s -v' %\
-                (SCREENSHOT_GENERATOR, URL_FILE, uagent_tmpdir, HAR_GENERATOR_LOG)
+                (SCREENSHOT_GENERATOR, URL_FILE, uagent_tmpdir, SCREENSHOT_GENERATOR_LOG)
             if USER_AGENTS[user_agent_tag]['string']:
                 har_cmd += ' -u "%s"' % USER_AGENTS[user_agent_tag]['string']
                 screenshot_cmd += ' -u "%s"' % USER_AGENTS[user_agent_tag]['string']
@@ -218,7 +219,7 @@ def main():
     ##
     # TODO: test
     try:
-        rsync_cmd = '%s -avz %s %s:%s' %\
+        rsync_cmd = '%s -avz --delete %s %s:%s' %\
             (RSYNC, OUTDIR, WEB_SERVER, WEB_SERVER_DIR)
         logging.debug('Running rsync: %s', rsync_cmd)
         subprocess.check_call(rsync_cmd.split())

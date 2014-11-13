@@ -307,8 +307,8 @@ def main():
                 http_only_harpaths.append(http_path)
         for https_path in glob.glob(args.indir + '/https---*.har'):
             # look for an HTTP HAR
-            http_path = string.replace(http_path, 'https---', 'http---')
-            if not os.path.exists(https_path):
+            http_path = string.replace(https_path, 'https---', 'http---')
+            if not os.path.exists(http_path):
                 https_only_harpaths.append(https_path)
 
         # summary dict maps stat names (e.g., 'num_objects') to dictionaries:
@@ -323,7 +323,7 @@ def main():
             ['Both', len(both_harpaths)]
         ]
         basic_stats = ('num_objects', 'num_tcp_handshakes', 'num_mbytes', 'num_hosts',)
-        
+
         # extract stats from the sites accessible over only HTTP
         for http_path in http_only_harpaths:
             logging.debug('Har path: %s' % http_path)
@@ -350,7 +350,7 @@ def main():
             ## global summary stats
             ##
             summary['sites'].append({
-                'site':http_har.base_url,  # URL
+                'site':https_har.base_url,  # URL
                 'availability':'https-only',  # protocol availability
                 'https_partial':'yes' if https_har.num_http_objects > 0 else 'no',
             })
@@ -392,7 +392,8 @@ def main():
 
         # sort stats by HTTP and by HTTPS; save all three versions
         for stat in basic_stats + ('http_site_protocol_counts', 'https_site_protocol_counts'):
-            three_sort(summary[stat])
+            if len(summary[stat]) > 0:
+                three_sort(summary[stat])
 
         # save summary stats
         filepath = os.path.join(args.outdir, 'summary.json')
