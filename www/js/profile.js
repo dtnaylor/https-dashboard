@@ -252,6 +252,7 @@ function main() {
 		 * Site URL
 		 */
 		document.getElementById("site-url").innerHTML = data["base-url"];
+		document.title = data["base-url"] + " | HTTPS Dashboard";
 
 		/*
 		 * Site thumbnails
