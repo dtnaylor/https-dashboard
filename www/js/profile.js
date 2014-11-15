@@ -102,7 +102,10 @@ function make_pie_chart(id, title, data, tooltip_postfix, margin, series_name) {
             type: 'pie',
 			name: series_name,
             data: data,
-        }]
+        }],
+        credits: {
+            enabled: false
+        }
     });
 }
 
@@ -164,6 +167,9 @@ function make_stacked_bar(id, title, ylabel, tooltip_postfix, stacking, categori
 			},
             legend: {
                 reversed: true
+            },
+            credits: {
+                enabled: false
             },
             plotOptions: {
                 series: {
@@ -287,7 +293,7 @@ function main() {
                 type: 'bar'
             },
             title: {
-                text: 'Basic Statistics'
+                text: null
             },
             xAxis: {
                 categories: ['Number of Objects', 'Total Size (MB)', 'Number of Hosts', 'Number of Connections'],
@@ -307,9 +313,6 @@ function main() {
                         enabled: true
                     }
                 }
-            },
-            credits: {
-                enabled: false
             },
             series: [{
                 name: 'HTTP',

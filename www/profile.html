@@ -103,6 +103,10 @@
 		<div class="row">
 			<div class="col-md-8">
 	  			<h1 id="site-url" style="margin: 0px">Site URL</h1>
+				<p>&nbsp;</p>
+				<a href="#summary" class="btn btn-primary" role="button">Summary</a>
+				<a href="#object-type" class="btn btn-primary" role="button">Object Type</a>
+				<a href="#object-fetch-protocols" class="btn btn-primary" role="button">Object Fetch Protocols</a>
 			</div> <!-- URL column -->
 		
 		
@@ -122,9 +126,10 @@
 	
 	
 
-	<!-- basic stats bar chart -->
+	<!-- SUMMARY -->
 	<div class="row">
 		<div class="col-md-12">
+			<h2><a name="summary"></a>Summary&nbsp;<sup><a style="color:inherit;"data-toggle="modal" data-target="#page-differences-modal"><span class="glyphicon glyphicon-question-sign" style="font-size:16px"></span></a></sup></h2>
 			<div id="basic-stats" style="width=100%; height: 350px;"></div>
 		</div> <!-- stat chart column -->
 
@@ -132,18 +137,12 @@
 
 	
 	
-	<!-- comparison header -->
-	<div class="row">
-		<div class="col-md-12">
-			<h2>Page Differences&nbsp;<sup><a style="color:inherit;"data-toggle="tooltip" data-placement="right" title="Sites often serve different versions over HTTP and HTTPS."><span class="glyphicon glyphicon-question-sign" style="font-size:16px"></span></a></sup></h2>
-		</div>
-	</div> <!-- row -->
 	
 	
-	<!-- object type header -->
+	<!-- OBJECT TYPE -->
 	<div class="row">
 		<div class="col-md-12">
-			<h3>Object Type Breakdown
+			<h2><a name="object-type"></a>Object Type
 			<!-- sort dropdown -->
 			<div class="btn-group pull-right">
 			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
@@ -156,7 +155,7 @@
 			    <li><a href="javascript: load_object_type_breakdown('size', 'percent');">Object Size (Percent)</a></li>
 			  </ul>
 			</div> <!-- sort dropdown -->
-			</h3>
+			</h2>
 		</div>
 	</div> <!-- row -->
 	
@@ -182,10 +181,12 @@
 	<p>&nbsp;</p>
 	<p>&nbsp;</p>
 	
-	<!-- protocol section header -->
+
+
+	<!-- FETCH PROTOCOLS -->
 	<div class="row">
 		<div class="col-md-12">
-			<h3>Per-Object Fetch Protocol&nbsp;<sup><a style="color:inherit;"data-toggle="tooltip" data-placement="right" title="Web pages are made up of several objects: HTML files, images, scripts, etc. Each one is fetched from the server separately. Sometimes, even when the main HTML document is loaded with HTTPS, some of the objects it contains are still loaded over HTTP."><span class="glyphicon glyphicon-question-sign" style="font-size:16px"></span></a></sup>
+			<h2><a name="object-fetch-protocols"></a>Object Fetch Protocols&nbsp;<sup><a style="color:inherit;"data-toggle="modal" data-target="#fetch-protocol-modal"><span class="glyphicon glyphicon-question-sign" style="font-size:16px"></span></a></sup>
 			<button id="obj-details-btn" type="button"
 			class="btn btn-default btn-sm active pull-right"
 			onclick="$('#object-details').toggle();
@@ -193,7 +194,7 @@
 				$('#obj-details-btn').removeClass('active');
 			else
 				$('#obj-details-btn').addClass('active');">Show Details</button>
-			</h3>
+			</h2>
 		</div>
 	</div> <!-- row -->
 
@@ -228,6 +229,98 @@
 	<p>&nbsp;</p>
 
     </div> <!-- container -->
+
+
+
+
+
+
+	<!-- =============== BEGIN EXPLANATION MODALS =============== -->
+	
+	<!-- PAGE DIFFERENCES -->
+	<div class="modal fade" id="page-differences-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+	        <h4 class="modal-title" id="myModalLabel">Page Differences</h4>
+	      </div>
+	      <div class="modal-body">
+			<p>Web pages are made up of multiple objects. This first object fetched is
+			an HTML document, which tells your browser which additional objects it
+			should load and how to display them. Additional objects could include
+			scripts, style sheets, and images.</p>
+
+			<p style="text-align: center;"><img src="img/objects@2x.png" width="204px"/></p>
+
+			<p>For complex pages, these objects are often served from different
+			servers. For example, a site might host all of its HTML and JavaScript
+			on one server and its images on another. Sometimes, sites serve pages
+			differently over HTTP and HTTPS: for instance, the site might serve
+			objects from fewer servers so it needs fewer certificates or to avoid
+			extra TLS handshakes. It might also server fewer objects (e.g., by
+			inserting CSS into the HTML document itself).</p>
+			
+			<p style="text-align: center;"><img src="img/object-differences.png" style="width: 100%; max-width: 996px;"/></p>
+
+			<p>This section of the summary compares the HTTP and HTTPS versions of
+			the sites we crawled in terms of:
+			<ul>
+				<li><strong>Number of Objects:</strong> How many objects did each version of the page load?</li>
+				<li><strong>Total Size:</strong> What was the cummulative size of all of the objects for each version of the page?</li>
+				<li><strong>Number of TCP Connections:</strong> How many connections did our browser make when it loaded each version of the page?</li>
+				<li><strong>Number of Hosts:</strong> How many servers did our browser contact when it loaded each version of the page?</li>
+			</ul>
+			</p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	
+	<!-- OBJECT FETCH PROTOCOL -->
+	<div class="modal fade" id="fetch-protocol-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+	        <h4 class="modal-title" id="myModalLabel">Object Fetch Protocol</h4>
+	      </div>
+	      <div class="modal-body">
+			<p>Web pages are made up of multiple objects. This first object fetched is
+			an HTML document, which tells your browser which additional objects it
+			should load and how to display them. Additional objects could include
+			scripts, style sheets, and images.</p>
+
+			<p style="text-align: center;"><img src="img/objects@2x.png" width="204px"/></p>
+
+			<p>Browsers open multiple connections to fetch these embedded
+			objects. Loading the page using an HTTPS URL instructs the browser
+			to download the root HTML document over a secure connection, but
+			that HTML document might tell the browser to use unsecure
+			connections to fetch some embedded objects.</p>
+
+			<p style="text-align: center;"><img src="img/fetch-protocols@2x.png" width="419px" style="max-width: 100%;"/></p>
+
+			<p>When this happens, modern browsers either display a warning icon
+			or omit the padlock icon altogether:</p>
+			
+			<p style="text-align: center;"><img src="img/chrome@2x.png" width="500px" style="max-width: 100%;"/></p>
+			<p style="text-align: center;"><img src="img/safari@2x.png" width="500px" style="max-width: 100%;"/></p>
+			<p style="text-align: center;"><img src="img/firefox@2x.png" width="500px" style="max-width: 100%;"/></p>
+
+			<p>This section of the summary compares the number of objects
+			loaded over HTTP and HTTPS for each version of each site.</p>
+
+
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	<!-- =============== END EXPLANATION MODALS =============== -->
+
+
 
 
 
