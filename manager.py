@@ -15,6 +15,14 @@ import tempfile
 import shutil
 import datetime
 import json
+import glob
+
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email.MIMEText import MIMEText
+from email.Utils import COMMASPACE, formatdate
+from email import Encoders
 
 from logging import handlers
 
@@ -27,6 +35,7 @@ HAR_GENERATOR = './web-profiler/tools/har_generator.py'
 SCREENSHOT_GENERATOR = './web-profiler/tools/screenshot_generator.py'
 PROFILER = './profiler.py'
 RSYNC = '/usr/bin/env rsync'
+RESULT_CHECKER = './check_results.py'
 
 
 
@@ -70,6 +79,33 @@ def load_conf(conf_file):
     return conf
 
 
+def send_mail(send_from, send_to, subject, text, server, credentials, files=[]):
+    assert isinstance(send_to, list)
+    assert isinstance(files, list)
+
+    msg = MIMEMultipart()
+    msg['From'] = send_from
+    msg['To'] = COMMASPACE.join(send_to)
+    msg['Date'] = formatdate(localtime=True)
+    msg['Subject'] = subject
+
+    msg.attach( MIMEText(text) )
+
+    for f in files:
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload( open(f,"rb").read() )
+        Encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(f))
+        msg.attach(part)
+    
+
+
+    smtp = smtplib.SMTP_SSL(server)
+    smtp.login(*credentials)
+    smtp.sendmail(send_from, send_to, msg.as_string())
+    smtp.close()
+
+
 
 def main():
     logging.info('=============== MANAGER LAUNCHED ===============')
@@ -94,6 +130,7 @@ def main():
     except:
         logging.exception('Error preparing temp directory')
         sys.exit(-1)
+
 
 
     ##
@@ -142,7 +179,7 @@ def main():
 
             # Get top 500 Alexa URLs
             # TODO: top 500
-            alexa_cmd = '%s -n 1 > %s' % (ALEXA_URL_FETCHER, alexa_url_list)
+            alexa_cmd = '%s -n 100 > %s' % (ALEXA_URL_FETCHER, alexa_url_list)
             logging.info('Getting Alexa URLs: %s' % alexa_cmd)
             subprocess.check_call(alexa_cmd, shell=True)  # TODO: careful!
 
@@ -158,54 +195,82 @@ def main():
             sys.exit(-1)
 
 
+
     ##
     ## Generate profiles
     ##
     for user_agent_tag in conf['USER_AGENTS']:
         logging.info('Generating profiles for user agent: %s' % user_agent_tag)
-        try:
+            
+        uagent_tmpdir = os.path.join(conf['TEMPDIR'], user_agent_tag)
+        uagent_outdir = os.path.join(conf['OUT_SUBDIR'], user_agent_tag)
 
-            ##
-            ## STAGE ONE: Generate HARs and screenshots for the URLs
-            ##
-            uagent_tmpdir = os.path.join(conf['TEMPDIR'], user_agent_tag)
-            har_cmd = '%s -f %s -o %s -g %s -v' %\
-                (HAR_GENERATOR, conf['URL_FILE'], uagent_tmpdir, conf['HAR_GENERATOR_LOG'])
+        ##
+        ## STAGE ONE: Capture HARs for the URLs
+        ##
+        try:
+            har_cmd = '%s -f %s -o %s -g %s -e %s -v' %\
+                (HAR_GENERATOR, conf['URL_FILE'], uagent_tmpdir,\
+                conf['HAR_GENERATOR_LOG'], conf['HAR_GENERATOR_FAILURES'])
+            if conf['USER_AGENTS'][user_agent_tag]['string']:
+                har_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
+            logging.debug('Running HAR genrator: %s', har_cmd)
+            subprocess.check_call(har_cmd, shell=True)  # TODO: careful!
+        except:
+            logging.exception('Error capturing HARs for user agent %s', user_agent_tag)
+            # TODO: mark error?
+
+
+        ##
+        ## STAGE TWO: Capture screenshots for the URLs
+        ##
+        try:
             screenshot_cmd = '%s -f %s -o %s -g %s -v' %\
                 (SCREENSHOT_GENERATOR, conf['URL_FILE'], uagent_tmpdir, conf['SCREENSHOT_GENERATOR_LOG'])
             if conf['USER_AGENTS'][user_agent_tag]['string']:
-                har_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
                 screenshot_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
-            logging.debug('Running HAR genrator: %s', har_cmd)
-            subprocess.check_call(har_cmd, shell=True)  # TODO: careful!
             logging.debug('Running screenshot genrator: %s', screenshot_cmd)
             subprocess.check_call(screenshot_cmd, shell=True)  # TODO: careful!
+        except:
+            logging.exception('Error capturing screenshots for user agent %s', user_agent_tag)
+            # TODO: mark error?
+
+
+        ##
+        ## STAGE TWO AND A HALF: Copy pickled results from tmpdir to outdir
+        ##
+        try:
+            for pickle_file in glob.glob(uagent_tmpdir + '/*.pickle'):
+                shutil.copy(pickle_file, uagent_outdir)
+        except:
+            logging.exception('Error copying pickled results.')
     
     
-            ##
-            ## STAGE TWO: Generate profiles
-            ##
-            uagent_outdir = os.path.join(conf['OUT_SUBDIR'], user_agent_tag)
+        ##
+        ## STAGE THREE: Generate profiles
+        ##
+        try:
             profiler_cmd = '%s -d %s -o %s -g %s -v' %\
                 (PROFILER, uagent_tmpdir, uagent_outdir, conf['PROFILER_LOG'])
             logging.debug('Running profiler: %s', profiler_cmd)
             subprocess.check_call(profiler_cmd.split())
-
-            ##
-            ## STAGE THREE: Prepare image thumbnails
-            ##
-            screenshot_dir = os.path.join(uagent_outdir, 'site_screenshots')
-            thumbnailer.process_image_dir(screenshot_dir)
-            
         except:
             logging.exception('Error profiling user agent %s', user_agent_tag)
             # TODO: mark error?
 
 
-    ##
-    ## Delete temp directories
-    ##
-    #shutil.rmtree(conf['TEMPDIR'])
+        ##
+        ## STAGE FOUR: Prepare image thumbnails
+        ##
+        try:
+            screenshot_dir = os.path.join(uagent_outdir, 'site_screenshots')
+            thumbnailer.process_image_dir(screenshot_dir)
+            
+        except:
+            logging.exception('Error processing thumbnails for user agent %s', user_agent_tag)
+            # TODO: mark error?
+
+
 
     ##
     ## If successful, update main manifest
@@ -242,6 +307,43 @@ def main():
         subprocess.check_call(rsync_cmd.split())
     except:
         logging.exception('Error copying profiles to web server')
+
+
+
+    ##
+    ## Send summary email
+    ##
+    try:
+        # generate summary file
+        summary_path = os.path.join(conf['TEMPDIR'], 'crawl_summary.txt')
+        checker_cmd = '%s %s > %s'\
+            % (RESULT_CHECKER, conf['OUTDIR'], summary_path)
+            
+        logging.debug('Running checker: %s', rsync_cmd)
+        subprocess.check_call(checker_cmd, shell=True)  # TODO: careful!
+    
+        # email summary file
+        smtp_conf = None
+        with open(conf['SMTP_CONF'], 'r') as f:
+            smtp_conf = eval(f.read())
+        f.closed
+
+        send_mail('dtbn07@gmail.com',\
+                  ['dtbn07@gmail.com'],\
+                  'HTTPS Dashboard Crawl Summary',\
+                  '',\
+                  smtp_conf['server'],\
+                  smtp_conf['credentials'],\
+                  files=[summary_path])
+    except:
+        logging.exception('Error sending summary email.')
+
+
+
+    ##
+    ## Delete temp directories
+    ##
+    #shutil.rmtree(conf['TEMPDIR'])
 
     
     logging.info('Done.')
