@@ -230,7 +230,7 @@ function load_basic_stat_diff(stat, sort) {
                 formatter:function(a,b,c){
 					var s = '';
 					$.each(this.points, function(i, point) {
-                    	s += '<b>HTTPS-HTTP:</b> ' + point.y;
+                    	s += '<tspan style="font-size: 10px;">' + point.x + '</tspan><br/><b>HTTPS-HTTP:</b> ' + point.y;
 					});
                     return s;
                 },

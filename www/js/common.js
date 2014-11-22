@@ -180,22 +180,11 @@ function change_user_agent(user_agent) {
 	
 }
 
-
 /*
- * MAIN ENTRY POINT
+ * Load the main manifest
+ * (overall information like list of crawl dates)
  */
-$(function () {
-	//
-	// DATA DIRECTORY
-	//
-	var profile_dir = './profiles/';
-	LocalStorage.set('profile-dir', profile_dir);
-
-
-
-	//
-	// LOAD MAIN MANIFEST
-	//
+function load_main_manifest() {
 	load_json(get_main_manifest_path(), 'main-manifest');
 
 	// get last crawl date
@@ -218,12 +207,13 @@ $(function () {
 			+ crawl_date  // TODO: prettier format?
 			+ '</a></li>';
 	}
+}
 
-
-
-	//
-	// LOAD CRAWL MANIFEST
-	//
+/*
+ * Load crawl manifest
+ * (information about a particular crawl date like user agent list)
+ */
+function load_crawl_manifest() {
 	load_json(get_crawl_manifest_path(), 'crawl-manifest');
 
 	// load last user agent
@@ -247,7 +237,29 @@ $(function () {
 			+ '</a></li>'
 			+ user_agent_menu.innerHTML;
 	}
+}
 
+
+/*
+ * MAIN ENTRY POINT
+ */
+$(function () {
+	//
+	// DATA DIRECTORY
+	//
+	LocalStorage.set('profile-dir', './profiles/');
+
+
+	//
+	// LOAD MAIN MANIFEST
+	//
+	load_main_manifest();
+
+
+	//
+	// LOAD CRAWL MANIFEST
+	//
+	load_crawl_manifest();
 
 
 	// call page-specific main()

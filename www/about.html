@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About | HTTPS Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  </head>
+  <body>
+	
+	
+	
+	<!-- =============== COMMON HEADER =============== -->
+	<nav class="navbar navbar-default" role="navigation">
+	  <div class="container-fluid">
+	    <!-- Brand and toggle get grouped for better mobile display -->
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="index.html">HTTPS Dashboard</a>
+	    </div>
+	
+	    <!-- Collect the nav links, forms, and other content for toggling -->
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+	  	<!-- LINKS (left) -->
+	      <ul class="nav navbar-nav">
+	        <li><a href="summary.html">Summary</a></li>
+	        <li><a href="sites.html">Per-Site Details</a></li>
+	        <li class="active"><a href="about.html">About</a></li>
+	      </ul>
+
+	  	<!-- CONTROL MENUS (right) -->
+	      <ul class="nav navbar-nav navbar-right">
+	  	    <!-- CRAWL DATE -->
+	  	    <li style="border-left: 1px solid #e1e1e1;"><p class="navbar-text" style="margin-right: 0px;"><strong>Crawl Date:</strong></p></li>
+	        <li class="dropdown">
+	          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="crawl-date-display">Date</span> <span class="caret"></span></a>
+	          <ul class="dropdown-menu" role="menu" id="crawl-date-menu">
+	  		  <!-- to be filled in programatically on page load -->
+	          </ul>
+	        </li> <!-- user agent dropdown -->
+
+	  	    <!-- USER AGENT -->
+	  	    <li style="border-left: 1px solid #e1e1e1;"><p class="navbar-text" style="margin-right: 0px;"><strong>User Agent:</strong></p></li>
+	        <li class="dropdown">
+	          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="user-agent-display">User Agent</span> <span class="caret"></span></a>
+	          <ul class="dropdown-menu" role="menu" id="user-agent-menu">
+	  		  <!-- to be filled in programatically on page load -->
+	            <li class="divider"></li>
+	            <li><a href="user_agents.html">Details</a></li>
+	          </ul>
+	        </li> <!-- user agent dropdown -->
+
+	      </ul>
+	    </div><!-- /.navbar-collapse -->
+	  </div><!-- /.container-fluid -->
+	</nav><!-- navbar -->
+	<!-- ============= END COMMON HEADER ============= -->
+
+
+
+
+
+
+
+	<div class="container">
+	
+	
+
+
+	<!-- ABOUT TEXT -->
+	<div class="row">
+		<div class="col-md-10 col-md-offset-1">
+	
+			<div class="page-header">
+			  <h1>About HTTPS Dashbaord</h1>
+			</div>
+			
+			<p>HTTPS Dashboard was created by a team of researchers exploring
+			the use of HTTPS on the Web. We are interested HTTPS usage trends
+			and the benefits and challenges of an HTTPS-by-default Web. In
+			particular, this site displays the changes content providers
+			sometimes make to their sites when they deploy an HTTPS
+			version.</p>
+
+		</div> <!-- col -->
+	</div> <!-- row -->
+
+
+
+
+
+
+
+	<!-- PAPER & POSTER -->
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+
+			<p>&nbsp;</p>
+			<div class="panel panel-default">
+			  <div class="panel-body">
+
+				<table align="center" cellspacing=5px" >
+					<tr>
+						<td>
+							<a href="http://www.cs.cmu.edu/~dnaylor/CostOfTheS.pdf"><img src="img/https_icon@2x.png" height="150px"/></a>
+						</td>
+						<td>
+							<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+						</td>
+						<td>
+							<a href="http://www.cs.cmu.edu/~dnaylor/CostOfTheS.pdf"><img src="img/https_poster_thumb@2x.png" height="150px"/></a>
+						</td>
+						<td>
+							<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+						</td>
+						<td>
+							<p>Check out our <a
+							href="http://conferences2.sigcomm.org/co-next/2014/">CoNEXT
+							2014</a> short paper on the costs of HTTPS.</p>
+						</td>
+					</tr>
+					<tr>
+						<td align="center">
+							<a href="http://www.cs.cmu.edu/~dnaylor/CostOfTheS.pdf">Read the Paper</a>
+						</td>
+						<td>
+							<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						</td>
+						<td align="center">
+							<a href="http://www.cs.cmu.edu/~dnaylor/https_poster.pdf">See the Poster</a>
+						</td>
+						<td align="center">
+							<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						</td>
+						<td>
+							<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						</td>
+					</tr>
+				</table>
+
+			  </div>
+			</div> <!-- panel -->
+
+		</div> <!-- col -->
+	</div> <!-- row -->
+
+
+	
+	
+
+
+
+	<!-- FAQs -->
+	<div class="row">
+		<div class="col-md-10 col-md-offset-1">
+
+			<h2>FAQs</h2>
+
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+			  <div class="panel panel-default">
+			    <div class="panel-heading" role="tab" id="headingOne">
+			      <h4 class="panel-title">
+			        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+			          Which URLs do you crawl?
+			        </a>
+			      </h4>
+			    </div>
+			    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+			      <div class="panel-body">
+					Before each crawl, we download the most recent version of the
+					global <a href="http://www.alexa.com/topsites">Alexa Top 500
+					Sites</a>. In the future, we hope to expand this list.
+			      </div>
+			    </div>
+			  </div>
+
+			  <div class="panel panel-default">
+			    <div class="panel-heading" role="tab" id="headingTwo">
+			      <h4 class="panel-title">
+			        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+			          When and where do you perform crawls?
+			        </a>
+			      </h4>
+			    </div>
+			    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+			      <div class="panel-body">
+					Our nightly crawls are performed from <a
+					href="http://www.cmu.edu">Carnegie Mellon University</a> in
+					Pittsburgh, PA, USA. In the future, we hope to crawl from
+					multiple locations.
+			      </div>
+			    </div>
+			  </div>
+
+			  <div class="panel panel-default">
+			    <div class="panel-heading" role="tab" id="headingThree">
+			      <h4 class="panel-title">
+			        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+			          What software do you use?
+			        </a>
+			      </h4>
+			    </div>
+			    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+			      <div class="panel-body">
+					<p>We capture a HAR for each page using Google Chrome and <a
+					href="https://github.com/cyrus-and/chrome-har-capturer">Chrome
+					HAR Capturer</a>. We generate screenshots using <a
+					href="http://phantomjs.org/screen-capture.html">PhantomJS</a>.</p>
+
+					Our Web profiling code is available on <a
+					href="https://github.com/dtnaylor/web-profiler">Github</a>.
+			      </div>
+			    </div>
+			  </div>
+			  
+			  <div class="panel panel-default">
+			    <div class="panel-heading" role="tab" id="headingFour">
+			      <h4 class="panel-title">
+			        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+			          Can I see a side-by-side comparison of a site's mobile and desktop versions?
+			        </a>
+			      </h4>
+			    </div>
+			    <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+			      <div class="panel-body">
+				  	Sorry, not right now.
+			      </div>
+			    </div>
+			  </div>
+			  
+			  <div class="panel panel-default">
+			    <div class="panel-heading" role="tab" id="headingFive">
+			      <h4 class="panel-title">
+			        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+			          Can I see how a site's structure has evolved over time?
+			        </a>
+			      </h4>
+			    </div>
+			    <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+			      <div class="panel-body">
+				  	Not right now, but we're working on it.
+			      </div>
+			    </div>
+			  </div>
+			  
+			  <div class="panel panel-default">
+			    <div class="panel-heading" role="tab" id="headingSix">
+			      <h4 class="panel-title">
+			        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+			          It looks like the screenshot doesn't completely match the numbers in the profile. Am I crazy?
+			        </a>
+			      </h4>
+			    </div>
+			    <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+			      <div class="panel-body">
+					This is possible. Our profiles are based on HARs captured
+					by Chrome, but we haven't found a good way to render a page
+					to an image file from Chrome via the command line (if you
+					have suggestions, we're all ears!). So, for the time being,
+					we're making a second pass using PhantomJS to capture
+					screenshots. If Chrome and PhantomJS load a page
+					differently (e.g., sometimes Chrome refuses to load mixed
+					content), there may be discrepancies between the numbers in
+					the profile and the screenshot.
+			      </div>
+			    </div>
+			  </div>
+
+			</div>  <!-- panel group -->
+
+		</div> <!-- col -->
+	</div> <!-- row -->
+	
+	
+	
+	<!-- CONTACT -->
+	<div class="row">
+		<div class="col-md-10 col-md-offset-1">
+
+			<h2>Contact</h2>
+			<p>Questions or comments? Contact <a href="http://www.cs.cmu.edu/~dnaylor">David Naylor</a>.</p>
+
+		</div> <!-- col -->
+	</div> <!-- row -->
+		
+
+
+	<hr class="soften" style="padding-top: 20px; padding-bottom: 20px;">
+
+		
+	<!-- LOGOS -->
+	<div class="row">
+	<div style="text-align: center; padding-bottom: 50px;">
+		<a href="http://www.cs.cmu.edu"><img src="./img/cmu@2x.png" height="80px"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+		<a href="http://www.tid.es"><img src="./img/tid@2x.png" height="80px"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+		<a href="http://www.polito.it"><img src="./img/polito@2x.png" height="80px"></a>
+	</div> <!-- center block -->
+	</div> <!-- row -->
+
+
+
+    </div> <!-- container -->
+
+
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+	<!-- load data -->
+	<script src="./js/common.js"></script>
+	<!-- Google Analytics -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	
+	  ga('create', 'UA-56760190-1', 'auto');
+	  ga('send', 'pageview');
+	</script>
+
+  </body>
+</html>
