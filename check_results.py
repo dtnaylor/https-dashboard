@@ -144,14 +144,58 @@ def main():
     summary_text += field('User Agents', '')
     for uagent, loader in loaders[last_crawl].iteritems():
         summary_text += field(uagent, '', level=1)
+
+        if uagent not in loaders[recent_crawls[1]]: continue
         previous_loader = loaders[recent_crawls[1]][uagent]
 
         for url in loader.page_results:
             status = loader.page_results[url].status
+
+            if url not in previous_loader.page_results: continue
             previous_status = previous_loader.page_results[url].status
 
             if status != previous_status:
                 summary_text += field(url, '%s -> %s' % (previous_status, status), level=2)
+    
+    
+    
+    
+    
+    
+    ##
+    ## look for URLs whose recent statuses vary a lot
+    ##
+    summary_text += header('UNSTABLE URLS')
+    summary_text += field('User Agents', '')
+    for uagent, loader in loaders[last_crawl].iteritems():
+        summary_text += field(uagent, '', level=1)
+
+        for url in loader.page_results:
+            statuses = []
+
+            # collect recent statuses for this URL
+            for crawl in recent_crawls:
+                if url not in loaders[crawl][uagent].page_results: continue
+                statuses.append(loaders[crawl][uagent].page_results[url].status)
+
+            # count how many times this URL generated this status
+            status_counts = defaultdict(int)
+            for status in statuses:
+                status_counts[status] += 1
+
+            # report any URLs that didn't have the same status at least 90%
+            report = True
+            for status, count in status_counts.iteritems():
+                if float(count)/len(statuses) > 0.9 and\
+                    (status == 'SUCCESS' or status == 'FAILURE_NOT_ACCESSIBLE'):
+                    report = False
+                    break
+
+            if report:
+                summary_text += field(url, statuses, level=2)
+
+
+
 
 
 
