@@ -13,6 +13,7 @@ import logging
 import subprocess
 import tempfile
 import shutil
+import time
 import datetime
 import json
 import glob
@@ -106,9 +107,42 @@ def send_mail(send_from, send_to, subject, text, server, credentials, files=[]):
     smtp.close()
 
 
+class TimeLog(object):
+
+    def __init__(self, format='%H:%M:%S'):
+        self._times = []  # list of tuples: (tag, timestamp)
+        self._format = format
+    
+    def record_time(self, tag):
+        self._times.append((tag, datetime.datetime.now()))
+
+    def __str__(self):
+        string = ''
+        last_timestamp = None
+        for tag, timestamp in self._times:
+            difference = ''
+            if last_timestamp:
+                difference = '\t(%s)' % (timestamp - last_timestamp)
+
+            string += '%s\t%s%s\n' % (tag, timestamp.strftime(self._format), difference)
+
+            last_timestamp = timestamp
+
+        string += '\nTOTAL TIME ELAPSED:  %s' % (self._times[-1][1] - self._times[0][1])
+
+        return string
+
+    def __repr__(self):
+        return self.__str__()
+
+
 
 def main():
     logging.info('=============== MANAGER LAUNCHED ===============')
+
+    timelog = TimeLog()
+    timelog.record_time('Manager launched')
+
 
     ##
     ## Prepare temp directories
@@ -130,6 +164,7 @@ def main():
     except:
         logging.exception('Error preparing temp directory')
         sys.exit(-1)
+    timelog.record_time('Set up temp directory')
 
 
 
@@ -166,6 +201,7 @@ def main():
     except:
         logging.exception('Error preparing output directory')
         sys.exit(-1)
+    timelog.record_time('Set up output directory')
 
 
 
@@ -193,6 +229,7 @@ def main():
         except:
             logging.exception('Error preparing URL list')
             sys.exit(-1)
+        timelog.record_time('Prepared URL list')
 
 
 
@@ -219,6 +256,7 @@ def main():
         except:
             logging.exception('Error capturing HARs for user agent %s', user_agent_tag)
             # TODO: mark error?
+        timelog.record_time('%s: HARs' % user_agent_tag)
 
 
         ##
@@ -234,6 +272,7 @@ def main():
         except:
             logging.exception('Error capturing screenshots for user agent %s', user_agent_tag)
             # TODO: mark error?
+        timelog.record_time('%s: screenshots' % user_agent_tag)
 
 
         ##
@@ -257,6 +296,7 @@ def main():
         except:
             logging.exception('Error profiling user agent %s', user_agent_tag)
             # TODO: mark error?
+        timelog.record_time('%s: profiles' % user_agent_tag)
 
 
         ##
@@ -269,6 +309,7 @@ def main():
         except:
             logging.exception('Error processing thumbnails for user agent %s', user_agent_tag)
             # TODO: mark error?
+        timelog.record_time('%s: thumbnails' % user_agent_tag)
 
 
 
@@ -307,6 +348,7 @@ def main():
         subprocess.check_call(rsync_cmd.split())
     except:
         logging.exception('Error copying profiles to web server')
+    timelog.record_time('Uploaded to AFS')
 
 
 
@@ -331,7 +373,7 @@ def main():
         send_mail('dtbn07@gmail.com',\
                   ['dtbn07@gmail.com'],\
                   'HTTPS Dashboard Crawl Summary',\
-                  '',\
+                  '%s\n\n' % timelog,\
                   smtp_conf['server'],\
                   smtp_conf['credentials'],\
                   files=[summary_path])
