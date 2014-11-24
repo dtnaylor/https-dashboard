@@ -192,12 +192,11 @@ def save_profile(http_har, https_har, outdir):
         profile['availability'] = 'https-only'
     else:
         profile['availability'] = 'both'
+                
+    if https_har:
+        profile['https_partial'] = 'yes' if https_har.num_http_objects > 0 else 'no'
         
     
-    ## figure out which HAR is http and https
-    #http_har = get_http_har(har1, har2)
-    #https_har = get_https_har(har1, har2)
-
 
     ##
     ## Individual profiles
