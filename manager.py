@@ -215,7 +215,7 @@ def main():
 
             # Get top 500 Alexa URLs
             # TODO: top 500
-            alexa_cmd = '%s -n 100 > %s' % (ALEXA_URL_FETCHER, alexa_url_list)
+            alexa_cmd = '%s -n 500 > %s' % (ALEXA_URL_FETCHER, alexa_url_list)
             logging.info('Getting Alexa URLs: %s' % alexa_cmd)
             subprocess.check_call(alexa_cmd, shell=True)  # TODO: careful!
 
@@ -246,9 +246,9 @@ def main():
         ## STAGE ONE: Capture HARs for the URLs
         ##
         try:
-            har_cmd = '%s -f %s -o %s -g %s -e %s -v' %\
+            har_cmd = '%s -f %s -o %s -g %s -v' %\
                 (HAR_GENERATOR, conf['URL_FILE'], uagent_tmpdir,\
-                conf['HAR_GENERATOR_LOG'], conf['HAR_GENERATOR_FAILURES'])
+                conf['HAR_GENERATOR_LOG'])
             if conf['USER_AGENTS'][user_agent_tag]['string']:
                 har_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
             logging.debug('Running HAR genrator: %s', har_cmd)
@@ -342,6 +342,10 @@ def main():
     ## Copy files to web server
     ##
     try:
+        # renew kerberos ticket
+        subprocess.check_call('kinit -R'.split())
+
+        # sync files
         rsync_cmd = '%s -avz --delete %s %s:%s' %\
             (RSYNC, conf['OUTDIR'], conf['WEB_SERVER'], conf['WEB_SERVER_DIR'])
         logging.debug('Running rsync: %s', rsync_cmd)
