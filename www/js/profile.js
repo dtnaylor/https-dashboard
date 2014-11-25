@@ -261,6 +261,25 @@ function main() {
 		document.title = data["base-url"] + " | HTTPS Dashboard";
 
 		/*
+		 * Protocol support status
+		 */
+		 console.log(data);
+		 var support_label_div = document.getElementById("protocol-support-labels");
+		if (data["availability"] == 'http-only')
+			support_label_div.innerHTML = '<span class="label label-default">HTTP</span>';
+		else if (data["availability"] == 'both') {
+			if (data["https_partial"] == 'yes')
+				support_label_div.innerHTML = '<span class="label label-default">HTTP</span>&nbsp;&nbsp;<span class="label label-danger">Partial HTTPS</span>';
+			else
+				support_label_div.innerHTML = '<span class="label label-default">HTTP</span>&nbsp;&nbsp;<span class="label label-success">HTTPS</span>';
+		} else if (data["availability"] == 'https-only') {
+			if (data["https_partial"] == 'yes')
+				support_label_div.innerHTML = '<span class="label label-danger">Partial HTTPS</span>';
+			else
+				support_label_div.innerHTML = '<span class="label label-success">HTTPS</span>';
+		}
+
+		/*
 		 * Site thumbnails
 		 */
 		load_image_or_hide(get_thumbnail_path(params["site"], 'http'),
