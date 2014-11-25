@@ -51,12 +51,18 @@ def stats_for_loader(loader):
     num_urls = len(loader.page_results)
     num_loads = len(loader.urls)
 
+    num_restarts = 0
+    try:
+        num_restarts = loader.num_restarts
+    except:
+        pass
+
     # how many pages succeeded? weren't accessible? failed?
     status_counts = defaultdict(int)
     for url, page_result in loader.page_results.iteritems():
         status_counts[page_result.status] += 1
 
-    return num_urls, num_loads, status_counts
+    return num_urls, num_loads, num_restarts, status_counts
 
 
 def pad_list(l, length):
@@ -94,6 +100,7 @@ def main():
 
     num_urls_dict = defaultdict(list)  # user agent -> list
     num_loads_dict = defaultdict(list)  # user agent -> list
+    num_restarts_dict = defaultdict(list)  # user agent -> list
     status_counts_dict = defaultdict(lambda: defaultdict(list))  # user agent -> status -> list
     crawls_so_far = 0
     for crawl_date in recent_crawls:
@@ -102,7 +109,7 @@ def main():
 
         for uagent in loaders[crawl_date]:
         
-            num_urls, num_loads, status_counts =\
+            num_urls, num_loads, num_restarts, status_counts =\
                 stats_for_loader(loaders[crawl_date][uagent])
 
             pad_list(num_urls_dict[uagent], crawls_so_far)
@@ -110,6 +117,9 @@ def main():
 
             pad_list(num_loads_dict[uagent], crawls_so_far)
             num_loads_dict[uagent].append(num_loads)
+            
+            pad_list(num_restarts_dict[uagent], crawls_so_far)
+            num_restarts_dict[uagent].append(num_restarts)
 
             for status, count in status_counts.iteritems():
                 pad_list(status_counts_dict[uagent][status], crawls_so_far)
@@ -126,6 +136,7 @@ def main():
         summary_text += field(uagent, '', level=1)
         summary_text += field('# URLS', num_urls_dict[uagent], level=2)
         summary_text += field('# loads', num_loads_dict[uagent], level=2)
+        summary_text += field('# restarts', num_restarts_dict[uagent], level=2)
 
         for status, count in status_counts_dict[uagent].iteritems():
             summary_text += field(status, count, level=2)
