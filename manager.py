@@ -246,9 +246,9 @@ def main():
         ## STAGE ONE: Capture HARs for the URLs
         ##
         try:
-            har_cmd = '%s -f %s -o %s -g %s -v' %\
+            har_cmd = '%s -f %s -o %s -g %s -t %s -v' %\
                 (HAR_GENERATOR, conf['URL_FILE'], uagent_tmpdir,\
-                conf['HAR_GENERATOR_LOG'])
+                conf['HAR_GENERATOR_LOG'], conf['HAR_GENERATOR_STDOUT'])
             if conf['USER_AGENTS'][user_agent_tag]['string']:
                 har_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
             logging.debug('Running HAR genrator: %s', har_cmd)
@@ -365,7 +365,7 @@ def main():
         checker_cmd = '%s %s > %s'\
             % (RESULT_CHECKER, conf['OUTDIR'], summary_path)
             
-        logging.debug('Running checker: %s', rsync_cmd)
+        logging.debug('Running checker: %s', checker_cmd)
         subprocess.check_call(checker_cmd, shell=True)  # TODO: careful!
     
         # email summary file

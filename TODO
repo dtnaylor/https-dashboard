@@ -6,3 +6,5 @@
 - make sure all chrome processes are getting killed
 - write parser/comparer for pickled results (looking for changes in page availability)
 - check_protocol should try multiple times?
+- get stdout from chrome
+- click point in summary plot to go to profile
