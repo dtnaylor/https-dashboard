@@ -263,7 +263,6 @@ function main() {
 		/*
 		 * Protocol support status
 		 */
-		 console.log(data);
 		 var support_label_div = document.getElementById("protocol-support-labels");
 		if (data["availability"] == 'http-only')
 			support_label_div.innerHTML = '<span class="label label-default">HTTP</span>';
