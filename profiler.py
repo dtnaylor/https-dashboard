@@ -19,7 +19,7 @@ import glob
 from collections import defaultdict
 
 sys.path.append('./web-profiler')
-from webloader.har import Har
+from webloader.har import Har, HarError
 
 try:
     import geoip2.database
@@ -327,7 +327,11 @@ def main():
         for http_path in http_only_harpaths:
             logging.debug('Har path: %s' % http_path)
             # load HAR
-            http_har = Har.from_file(http_path)
+            try:
+                http_har = Har.from_file(http_path)
+            except HarError:
+                logging.exception('Error parsing HAR')
+                continue
             save_profile(http_har, None, profile_dir())
             
             ##
@@ -342,7 +346,11 @@ def main():
         for https_path in https_only_harpaths:
             logging.debug('Har path: %s' % https_path)
             # load HAR
-            https_har = Har.from_file(https_path)
+            try:
+                https_har = Har.from_file(https_path)
+            except HarError:
+                logging.exception('Error parsing HAR')
+                continue
             save_profile(None, https_har, profile_dir())
             
             ##
@@ -358,8 +366,12 @@ def main():
         for http_path, https_path in both_harpaths:
             logging.debug('Har paths: %s, %s', http_path, https_path)
             # load both HARs
-            http_har = Har.from_file(http_path)
-            https_har = Har.from_file(https_path)
+            try:
+                http_har = Har.from_file(http_path)
+                https_har = Har.from_file(https_path)
+            except HarError:
+                logging.exception('Error parsing HAR')
+                continue
             save_profile(http_har, https_har, profile_dir())
 
             ##

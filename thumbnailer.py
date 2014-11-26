@@ -96,7 +96,6 @@ if __name__ == "__main__":
                                      description='Process site screenshots.')
     parser.add_argument('-d', '--dir', help='Test dir')
     parser.add_argument('-f', '--file', help='Test image file')
-    parser.add_argument('-c', '--config', default='./default.conf', help='Manager configuration file')
     parser.add_argument('-q', '--quiet', action='store_true', default=False, help='only print errors')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='print debug info. --quiet wins if both are present')
     args = parser.parse_args()
