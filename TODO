@@ -9,3 +9,4 @@
 - click point in summary plot to go to profile
 - make table sorting work (site list)
 - add pickling + summary to screenshot generator
+- put rsync excludes in conf file; manager should generate exclude file to tmp dir

@@ -63,3 +63,4 @@ smtp.conf
 profiles
 test.conf
 test.urls
+logs

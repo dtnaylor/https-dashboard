@@ -346,7 +346,7 @@ def main():
         subprocess.check_call('kinit -R'.split())
 
         # sync files
-        rsync_cmd = '%s -avz --delete %s %s:%s' %\
+        rsync_cmd = '%s -avz --delete --delete-excluded --exclude-from=rsync.exclude %s %s:%s' %\
             (RSYNC, conf['OUTDIR'], conf['WEB_SERVER'], conf['WEB_SERVER_DIR'])
         logging.debug('Running rsync: %s', rsync_cmd)
         subprocess.check_call(rsync_cmd.split())
