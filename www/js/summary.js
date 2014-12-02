@@ -36,7 +36,10 @@ function main() {
     	    series: [{
     	        type: 'pie',
     	        data: data["availability"]
-    	    }]
+    	    }],
+        	credits: {
+        	    enabled: false
+        	}
     	});
 	});
 }
@@ -272,7 +275,10 @@ function load_basic_stat_diff(stat, sort) {
     	    series: [{
     	        name: 'HTTPS-HTTP',
     	        data: assign_threshold_colors(subtract_arrays(data[stat]["HTTPS"][sort], data[stat]["HTTP"][sort]), 0),
-    	    }]
+    	    }],
+        	credits: {
+        	    enabled: false
+        	}
     	});
 	});
 }
