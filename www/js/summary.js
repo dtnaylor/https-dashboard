@@ -207,7 +207,7 @@ function load_basic_stat_diff(stat, sort) {
     	        type: 'column'
     	    },
     	    title: {
-    	        text: 'Increase in HTTPS Version',
+    	        text: 'Increase in HTTPS Page',
     	    },
     	    xAxis: {
 				categories: data[stat]["url"][sort],

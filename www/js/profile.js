@@ -143,7 +143,7 @@ function dicts_to_stacked_bar_data(dicts) {
  * categories are the colored bar segments
  * series is an array of associative arrays w/ name and data entries
  */
-function make_stacked_bar(id, title, ylabel, tooltip_postfix, stacking, categories, series) {
+function make_stacked_bar(id, title, ylabel, yAllowDecimals, tooltip_postfix, stacking, categories, series) {
 	$(function () {
         $(id).highcharts({
             chart: {
@@ -157,6 +157,7 @@ function make_stacked_bar(id, title, ylabel, tooltip_postfix, stacking, categori
             },
             yAxis: {
                 min: 0,
+				allowDecimals: yAllowDecimals,
                 title: {
                     text: ylabel
                 }
@@ -205,12 +206,12 @@ function load_object_type_breakdown(metric, stacking) {
 			var series = dicts_to_stacked_bar_data([http_num_objects_by_type,
 													https_num_objects_by_type]);
 			var ylabel = stacking == 'normal' ? 'Number of Objects' : 'Percent of Objects';
-			make_stacked_bar('#object-types', null, ylabel, 'objects', stacking, ['HTTP', 'HTTPS'], series);
+			make_stacked_bar('#object-types', null, ylabel, false, 'objects', stacking, ['HTTP', 'HTTPS'], series);
 		} else if (metric == 'size') {
 			var series = dicts_to_stacked_bar_data([http_num_bytes_by_type,
 													https_num_bytes_by_type]);
 			var ylabel = stacking == 'normal' ? 'Number of Bytes' : 'Percent of Bytes';
-			make_stacked_bar('#object-types', null, ylabel, 'bytes', stacking, ['HTTP', 'HTTPS'], series);
+			make_stacked_bar('#object-types', null, ylabel, false, 'bytes', stacking, ['HTTP', 'HTTPS'], series);
 
 		}
 		
@@ -321,6 +322,7 @@ function main() {
             },
             yAxis: {
                 min: 0,
+				allowDecimals: false,
                 title: {
                     text: null
                 }
