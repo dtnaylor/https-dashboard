@@ -159,7 +159,16 @@ function load_basic_stat(stat, sort) {
     	                    }
     	                }
     	            }
-    	        }
+    	        },
+				series: {
+            	    point: {
+            	        events: {
+            	            click: function () {
+								window.location.href = 'profile.html?site=' + this.category;
+            	            }
+            	        }
+            	    }
+            	}
     	    },
     	    series: [{
     	        name: 'HTTP',
@@ -249,7 +258,16 @@ function load_basic_stat_diff(stat, sort) {
     	                    }
     	                }
     	            }
-    	        }
+    	        },
+				series: {
+            	    point: {
+            	        events: {
+            	            click: function () {
+								window.location.href = 'profile.html?site=' + this.category;
+            	            }
+            	        }
+            	    }
+            	}
     	    },
     	    series: [{
     	        name: 'HTTPS-HTTP',
