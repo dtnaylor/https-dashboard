@@ -10,3 +10,7 @@
 - make table sorting work (site list)
 - add pickling + summary to screenshot generator
 - put rsync excludes in conf file; manager should generate exclude file to tmp dir
+- http://www.cs.cmu.edu/~help/afs/authenticating_daemons.html
+- space management
+	- condense to weekly after a week, monthly after a month (like TM)
+	- only upload to AFS if there's space
