@@ -45,10 +45,14 @@ function main() {
 }
 
 function load_basic_stats(sort) {
-	var basic_stats = ["num_objects", "num_tcp_handshakes", "num_mbytes", "num_hosts"];
+	var basic_stats = ["num_objects", "num_mbytes", "num_tcp_handshakes", "num_hosts"];
+	var highlightBG = false;
 	basic_stats.forEach(function(stat) {
-		load_basic_stat(stat, sort);
-		load_basic_stat_diff(stat, sort);
+		var bgcolor = highlightBG ? "#F0F8FF" : "#ffffff";
+		highlightBG = !highlightBG;
+
+		load_basic_stat(stat, sort, bgcolor);
+		load_basic_stat_diff(stat, sort, bgcolor);
 	});
 }
 
@@ -122,11 +126,12 @@ ylabels["num_tcp_handshakes"] = "Number of TCP Connections";
 ylabels["num_mbytes"] = "Total Size (MB)";
 ylabels["num_hosts"] = "Number of Hosts";
 
-function load_basic_stat(stat, sort) {
+function load_basic_stat(stat, sort, bgcolor) {
 	$.getJSON(get_summary_json_path(), function(data) {
     	$('#'+stat).highcharts({
     	    chart: {
-    	        type: 'area'
+    	        type: 'area',
+				backgroundColor: bgcolor,
     	    },
     	    title: {
     	        text: ylabels[stat]
@@ -212,11 +217,12 @@ function assign_threshold_colors(data, threshold) {
 	return colored_data;
 }
 
-function load_basic_stat_diff(stat, sort) {
+function load_basic_stat_diff(stat, sort, bgcolor) {
 	$.getJSON(get_summary_json_path(), function(data) {
     	$('#'+stat+"-diff").highcharts({
     	    chart: {
-    	        type: 'column'
+    	        type: 'column',
+				backgroundColor: bgcolor,
     	    },
     	    title: {
     	        text: 'Increase in HTTPS Page',
