@@ -194,10 +194,10 @@ def main():
             for status in statuses:
                 status_counts[status] += 1
 
-            # report any URLs that didn't have the same status at least 90%
+            # report any URLs that didn't have the same status at least 75%
             report = True
             for status, count in status_counts.iteritems():
-                if float(count)/len(statuses) > 0.9 and\
+                if float(count)/len(statuses) > 0.75 and\
                     (status == 'SUCCESS' or status == 'FAILURE_NOT_ACCESSIBLE'):
                     report = False
                     break
