@@ -360,15 +360,25 @@ def main():
     ## Send summary email
     ##
     try:
-        # generate summary file
-        summary_path = os.path.join(conf['TEMPDIR'], 'crawl_summary.txt')
-        checker_cmd = '%s %s > %s'\
-            % (RESULT_CHECKER, conf['OUTDIR'], summary_path)
+        # generate HAR summary file
+        har_summary_path = os.path.join(conf['TEMPDIR'], 'har_summary.txt')
+        checker_cmd = '%s %s -f %s > %s'\
+            % (RESULT_CHECKER, conf['OUTDIR'], 'har_generator_results.pickle',\
+                har_summary_path)
             
-        logging.debug('Running checker: %s', checker_cmd)
+        logging.debug('Running checker for HAR files: %s', checker_cmd)
+        subprocess.check_call(checker_cmd, shell=True)  # TODO: careful!
+        
+        # generate screenshot summary file
+        screenshot_summary_path = os.path.join(conf['TEMPDIR'], 'screenshot_summary.txt')
+        checker_cmd = '%s %s -f %s > %s'\
+            % (RESULT_CHECKER, conf['OUTDIR'],\
+                'screenshot_generator_results.pickle', screenshot_summary_path)
+            
+        logging.debug('Running checker for screenshot files: %s', checker_cmd)
         subprocess.check_call(checker_cmd, shell=True)  # TODO: careful!
     
-        # email summary file
+        # email summary files
         smtp_conf = None
         with open(conf['SMTP_CONF'], 'r') as f:
             smtp_conf = eval(f.read())
@@ -380,7 +390,7 @@ def main():
                   '%s\n\n' % timelog,\
                   smtp_conf['server'],\
                   smtp_conf['credentials'],\
-                  files=[summary_path])
+                  files=[har_summary_path, screenshot_summary_path])
     except:
         logging.exception('Error sending summary email.')
 

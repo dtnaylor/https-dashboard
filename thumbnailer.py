@@ -76,7 +76,10 @@ def process_image_file(image_file):
 
 def process_image_dir(image_dir):
     for image_file in glob.glob(image_dir + '/*'):
-        process_image_file(image_file)
+        try:
+            process_image_file(image_file)
+        except:
+            logging.exception('Error processing image: %s', image_file)
 
 
 

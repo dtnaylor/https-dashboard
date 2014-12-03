@@ -77,7 +77,7 @@ def main():
     for crawl_dir in glob.glob(args.profiles + '/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'):
         for uagent_dir in glob.glob(crawl_dir + '/*'):
             if os.path.isdir(uagent_dir):
-                for har_result_pickle in glob.glob(uagent_dir + '/har_generator_results.pickle'):
+                for har_result_pickle in glob.glob(uagent_dir + '/' + args.picklefile):
                     date_string = os.path.split(crawl_dir)[1]
                     user_agent = os.path.split(uagent_dir)[1]
 
@@ -237,6 +237,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,\
                                      description='Check pickled HAR generator results for possible errors.')
     parser.add_argument('profiles', nargs='?', default='./profiles', help='Profile directory.')
+    parser.add_argument('-f', '--picklefile', default='har_generator_results.pickle', help='Result file name (e.g., HAR generator results, screenshot generator results).')
     parser.add_argument('-q', '--quiet', action='store_true', default=False, help='only print errors')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='print debug info. --quiet wins if both are present')
     args = parser.parse_args()
