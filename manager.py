@@ -317,6 +317,7 @@ def main():
     ## If successful, update main manifest
     ##
     # TODO: only update if everything was OK?
+    # TODO: filter old crawls (adjust manifest, build rsync exclude list)
     try:
         main_manifest_file = os.path.join(conf['OUTDIR'], 'main-manifest.json')
         if os.path.exists(main_manifest_file):
@@ -342,12 +343,21 @@ def main():
     ## Copy files to web server
     ##
     try:
+        # make an rsync exclude file
+        rsync_exclude_path = os.path.join(conf['TEMPDIR'], 'rsync.exclude')
+        with open(rsync_exclude_path, 'w') as f:
+            for entry in conf['RSYNC_EXCLUDE']:
+                f.write('%s\n' % entry)
+        f.closed
+        # TODO: also add files we want to pull off the web server
+
         # renew kerberos ticket
         subprocess.check_call('kinit -R'.split())
 
         # sync files
-        rsync_cmd = '%s -avz --delete --delete-excluded --exclude-from=rsync.exclude %s %s:%s' %\
-            (RSYNC, conf['OUTDIR'], conf['WEB_SERVER'], conf['WEB_SERVER_DIR'])
+        rsync_cmd = '%s -avz --delete --delete-excluded --exclude-from=%s %s %s:%s' %\
+            (RSYNC, rsync_exclude_path, conf['OUTDIR'], conf['WEB_SERVER'],\
+            conf['WEB_SERVER_DIR'])
         logging.debug('Running rsync: %s', rsync_cmd)
         subprocess.check_call(rsync_cmd.split())
     except:
