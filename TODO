@@ -6,6 +6,4 @@
 - make table sorting work (site list)
 - rolling log files
 - http://www.cs.cmu.edu/~help/afs/authenticating_daemons.html
-- space management
-	- condense to weekly after a week, monthly after a month (like TM)
-	- only upload to AFS if there's space
+- List of crawl dates in UI will get out of hand
