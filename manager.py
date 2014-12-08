@@ -236,107 +236,107 @@ def main():
     ##
     ## Generate profiles
     ##
-    for user_agent_tag in conf['USER_AGENTS']:
-        logging.info('Generating profiles for user agent: %s' % user_agent_tag)
-            
-        uagent_tmpdir = os.path.join(conf['TEMPDIR'], user_agent_tag)
-        uagent_outdir = os.path.join(conf['OUT_SUBDIR'], user_agent_tag)
+    #for user_agent_tag in conf['USER_AGENTS']:
+    #    logging.info('Generating profiles for user agent: %s' % user_agent_tag)
+    #        
+    #    uagent_tmpdir = os.path.join(conf['TEMPDIR'], user_agent_tag)
+    #    uagent_outdir = os.path.join(conf['OUT_SUBDIR'], user_agent_tag)
 
-        ##
-        ## STAGE ONE: Capture HARs for the URLs
-        ##
-        try:
-            har_cmd = '%s -f %s -o %s -g %s -t %s -v' %\
-                (HAR_GENERATOR, conf['URL_FILE'], uagent_tmpdir,\
-                conf['HAR_GENERATOR_LOG'], conf['HAR_GENERATOR_STDOUT'])
-            if conf['USER_AGENTS'][user_agent_tag]['string']:
-                har_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
-            logging.debug('Running HAR genrator: %s', har_cmd)
-            subprocess.check_call(har_cmd, shell=True)  # TODO: careful!
-        except:
-            logging.exception('Error capturing HARs for user agent %s', user_agent_tag)
-            # TODO: mark error?
-        timelog.record_time('%s: HARs' % user_agent_tag)
-
-
-        ##
-        ## STAGE TWO: Capture screenshots for the URLs
-        ##
-        try:
-            screenshot_cmd = '%s -f %s -o %s -g %s -v' %\
-                (SCREENSHOT_GENERATOR, conf['URL_FILE'], uagent_tmpdir, conf['SCREENSHOT_GENERATOR_LOG'])
-            if conf['USER_AGENTS'][user_agent_tag]['string']:
-                screenshot_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
-            logging.debug('Running screenshot genrator: %s', screenshot_cmd)
-            subprocess.check_call(screenshot_cmd, shell=True)  # TODO: careful!
-        except:
-            logging.exception('Error capturing screenshots for user agent %s', user_agent_tag)
-            # TODO: mark error?
-        timelog.record_time('%s: screenshots' % user_agent_tag)
+    #    ##
+    #    ## STAGE ONE: Capture HARs for the URLs
+    #    ##
+    #    try:
+    #        har_cmd = '%s -f %s -o %s -g %s -t %s -v' %\
+    #            (HAR_GENERATOR, conf['URL_FILE'], uagent_tmpdir,\
+    #            conf['HAR_GENERATOR_LOG'], conf['HAR_GENERATOR_STDOUT'])
+    #        if conf['USER_AGENTS'][user_agent_tag]['string']:
+    #            har_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
+    #        logging.debug('Running HAR genrator: %s', har_cmd)
+    #        subprocess.check_call(har_cmd, shell=True)  # TODO: careful!
+    #    except:
+    #        logging.exception('Error capturing HARs for user agent %s', user_agent_tag)
+    #        # TODO: mark error?
+    #    timelog.record_time('%s: HARs' % user_agent_tag)
 
 
-        ##
-        ## STAGE TWO AND A HALF: Copy pickled results from tmpdir to outdir
-        ##
-        try:
-            for pickle_file in glob.glob(uagent_tmpdir + '/*.pickle'):
-                shutil.copy(pickle_file, uagent_outdir)
-        except:
-            logging.exception('Error copying pickled results.')
-    
-    
-        ##
-        ## STAGE THREE: Generate profiles
-        ##
-        try:
-            profiler_cmd = '%s -d %s -o %s -g %s -v' %\
-                (PROFILER, uagent_tmpdir, uagent_outdir, conf['PROFILER_LOG'])
-            logging.debug('Running profiler: %s', profiler_cmd)
-            subprocess.check_call(profiler_cmd.split())
-        except:
-            logging.exception('Error profiling user agent %s', user_agent_tag)
-            # TODO: mark error?
-        timelog.record_time('%s: profiles' % user_agent_tag)
+    #    ##
+    #    ## STAGE TWO: Capture screenshots for the URLs
+    #    ##
+    #    try:
+    #        screenshot_cmd = '%s -f %s -o %s -g %s -v' %\
+    #            (SCREENSHOT_GENERATOR, conf['URL_FILE'], uagent_tmpdir, conf['SCREENSHOT_GENERATOR_LOG'])
+    #        if conf['USER_AGENTS'][user_agent_tag]['string']:
+    #            screenshot_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
+    #        logging.debug('Running screenshot genrator: %s', screenshot_cmd)
+    #        subprocess.check_call(screenshot_cmd, shell=True)  # TODO: careful!
+    #    except:
+    #        logging.exception('Error capturing screenshots for user agent %s', user_agent_tag)
+    #        # TODO: mark error?
+    #    timelog.record_time('%s: screenshots' % user_agent_tag)
 
 
-        ##
-        ## STAGE FOUR: Prepare image thumbnails
-        ##
-        try:
-            screenshot_dir = os.path.join(uagent_outdir, 'site_screenshots')
-            thumbnailer.process_image_dir(screenshot_dir)
-            
-        except:
-            logging.exception('Error processing thumbnails for user agent %s', user_agent_tag)
-            # TODO: mark error?
-        timelog.record_time('%s: thumbnails' % user_agent_tag)
+    #    ##
+    #    ## STAGE TWO AND A HALF: Copy pickled results from tmpdir to outdir
+    #    ##
+    #    try:
+    #        for pickle_file in glob.glob(uagent_tmpdir + '/*.pickle'):
+    #            shutil.copy(pickle_file, uagent_outdir)
+    #    except:
+    #        logging.exception('Error copying pickled results.')
+    #
+    #
+    #    ##
+    #    ## STAGE THREE: Generate profiles
+    #    ##
+    #    try:
+    #        profiler_cmd = '%s -d %s -o %s -g %s -v' %\
+    #            (PROFILER, uagent_tmpdir, uagent_outdir, conf['PROFILER_LOG'])
+    #        logging.debug('Running profiler: %s', profiler_cmd)
+    #        subprocess.check_call(profiler_cmd.split())
+    #    except:
+    #        logging.exception('Error profiling user agent %s', user_agent_tag)
+    #        # TODO: mark error?
+    #    timelog.record_time('%s: profiles' % user_agent_tag)
+
+
+    #    ##
+    #    ## STAGE FOUR: Prepare image thumbnails
+    #    ##
+    #    try:
+    #        screenshot_dir = os.path.join(uagent_outdir, 'site_screenshots')
+    #        thumbnailer.process_image_dir(screenshot_dir)
+    #        
+    #    except:
+    #        logging.exception('Error processing thumbnails for user agent %s', user_agent_tag)
+    #        # TODO: mark error?
+    #    timelog.record_time('%s: thumbnails' % user_agent_tag)
 
 
 
-    ##
-    ## If successful, update main manifest
-    ##
-    # TODO: only update if everything was OK?
-    # TODO: filter old crawls (adjust manifest, build rsync exclude list)
-    try:
-        main_manifest_file = os.path.join(conf['OUTDIR'], 'main-manifest.json')
-        if os.path.exists(main_manifest_file):
-            with open(main_manifest_file, 'r') as f:
-                main_manifest = json.load(f)
-            f.closed
-        else:
-            main_manifest = {'dates': []}
+    ###
+    ### If successful, update main manifest
+    ###
+    ## TODO: only update if everything was OK?
+    ## TODO: filter old crawls (adjust manifest, build rsync exclude list)
+    #try:
+    #    main_manifest_file = os.path.join(conf['OUTDIR'], 'main-manifest.json')
+    #    if os.path.exists(main_manifest_file):
+    #        with open(main_manifest_file, 'r') as f:
+    #            main_manifest = json.load(f)
+    #        f.closed
+    #    else:
+    #        main_manifest = {'dates': []}
 
-        if today not in main_manifest['dates']:
-            main_manifest['dates'].append(today)
-        main_manifest['dates'] = sorted(main_manifest['dates'], reverse=True)
+    #    if today not in main_manifest['dates']:
+    #        main_manifest['dates'].append(today)
+    #    main_manifest['dates'] = sorted(main_manifest['dates'], reverse=True)
 
-        with open(main_manifest_file, 'w') as f:
-            json.dump(main_manifest, f)
-        f.closed
+    #    with open(main_manifest_file, 'w') as f:
+    #        json.dump(main_manifest, f)
+    #    f.closed
 
-    except:
-        logging.exception('Error saving main manifest')
+    #except:
+    #    logging.exception('Error saving main manifest')
 
 
     ##
@@ -352,17 +352,18 @@ def main():
         # TODO: also add files we want to pull off the web server
 
         # renew kerberos ticket
-        subprocess.check_call('kinit -R'.split())
+        #subprocess.check_call('kinit -R'.split())
 
         # sync files
         rsync_cmd = '%s -avz --delete --delete-excluded --exclude-from=%s %s %s:%s' %\
             (RSYNC, rsync_exclude_path, conf['OUTDIR'], conf['WEB_SERVER'],\
             conf['WEB_SERVER_DIR'])
         logging.debug('Running rsync: %s', rsync_cmd)
-        subprocess.check_call(rsync_cmd.split())
+        #subprocess.check_call(rsync_cmd.split())
     except:
         logging.exception('Error copying profiles to web server')
     timelog.record_time('Uploaded to AFS')
+    sys.exit()
 
 
 
