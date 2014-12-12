@@ -82,9 +82,12 @@ def main():
                     user_agent = os.path.split(uagent_dir)[1]
 
                     loader = None
-                    with open(os.path.join(har_result_pickle), 'r') as f:
-                        loader = pickle.load(f)
-                    f.closed
+                    try:
+                        with open(os.path.join(har_result_pickle), 'r') as f:
+                            loader = pickle.load(f)
+                    except:
+                        logging.warn('Error reading pickled results: %s' % har_result_pickle)
+                        continue
 
                     loaders[date_string][user_agent] = loader
 
@@ -96,7 +99,7 @@ def main():
     ##
     ## summary of recent crawls
     ##
-    recent_crawls = sorted(loaders.keys(), reverse=True)
+    recent_crawls = sorted(loaders.keys(), reverse=True)#[:20]
 
     num_urls_dict = defaultdict(list)  # user agent -> list
     num_loads_dict = defaultdict(list)  # user agent -> list
@@ -151,22 +154,23 @@ def main():
     ## look for URLs that changed status this time
     ##
     last_crawl = recent_crawls[0]
-    summary_text += header('STATUS CHANGES')
-    summary_text += field('User Agents', '')
-    for uagent, loader in loaders[last_crawl].iteritems():
-        summary_text += field(uagent, '', level=1)
+    if len(recent_crawls) > 1:
+        summary_text += header('STATUS CHANGES')
+        summary_text += field('User Agents', '')
+        for uagent, loader in loaders[last_crawl].iteritems():
+            summary_text += field(uagent, '', level=1)
 
-        if uagent not in loaders[recent_crawls[1]]: continue
-        previous_loader = loaders[recent_crawls[1]][uagent]
+            if uagent not in loaders[recent_crawls[1]]: continue
+            previous_loader = loaders[recent_crawls[1]][uagent]
 
-        for url in loader.page_results:
-            status = loader.page_results[url].status
+            for url in loader.page_results:
+                status = loader.page_results[url].status
 
-            if url not in previous_loader.page_results: continue
-            previous_status = previous_loader.page_results[url].status
+                if url not in previous_loader.page_results: continue
+                previous_status = previous_loader.page_results[url].status
 
-            if status != previous_status:
-                summary_text += field(url, '%s -> %s' % (previous_status, status), level=2)
+                if status != previous_status:
+                    summary_text += field(url, '%s -> %s' % (previous_status, status), level=2)
     
     
     
