@@ -253,10 +253,13 @@ def main():
             if conf['USER_AGENTS'][user_agent_tag]['string']:
                 har_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
             logging.debug('Running HAR genrator: %s', har_cmd)
-            subprocess.check_call(har_cmd, shell=True)  # TODO: careful!
+            with open(conf['HAR_GENERATOR_STDOUT'], 'a') as f:
+                subprocess.check_call(har_cmd, stdout=f,\
+                    stderr=subprocess.STDOUT, shell=True)  # TODO: careful!
         except:
             logging.exception('Error capturing HARs for user agent %s', user_agent_tag)
             # TODO: mark error?
+            
         timelog.record_time('%s: HARs' % user_agent_tag)
 
 
@@ -269,7 +272,9 @@ def main():
             if conf['USER_AGENTS'][user_agent_tag]['string']:
                 screenshot_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
             logging.debug('Running screenshot genrator: %s', screenshot_cmd)
-            subprocess.check_call(screenshot_cmd, shell=True)  # TODO: careful!
+            with open(conf['SCREENSHOT_GENERATOR_STDOUT'], 'a') as f:
+                subprocess.check_call(screenshot_cmd, stdout=f,\
+                    stderr=subprocess.STDOUT, shell=True)  # TODO: careful!
         except:
             logging.exception('Error capturing screenshots for user agent %s', user_agent_tag)
             # TODO: mark error?
