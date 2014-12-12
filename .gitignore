@@ -64,3 +64,4 @@ profiles
 test.conf
 test.urls
 logs
+logs.test
