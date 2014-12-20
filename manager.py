@@ -42,6 +42,10 @@ RESULT_CHECKER = './check_results.py'
 
 
 def setup_logging():
+    # make log directory if it doesn't exist
+    if not os.path.exists(os.path.join(conf['PREFIX'], 'logs')):
+        os.makedirs(os.path.join(conf['PREFIX'], 'logs'))
+
     if args.quiet:
         level = logging.WARNING
     elif args.verbose:
@@ -59,7 +63,6 @@ def setup_logging():
     smtp_conf = None
     with open(conf['SMTP_CONF'], 'r') as f:
         smtp_conf = eval(f.read())
-    f.closed
 
     email_handler = handlers.SMTPHandler(\
         smtp_conf['server'], 'dtbn07@gmail.com',\
@@ -74,7 +77,9 @@ def load_conf(conf_file):
     try:
         with open(conf_file, 'r') as f:
             conf = eval(f.read())
-        f.closed
+
+        for path in conf['PATHS_TO_PREFIX']:
+            conf[path] = os.path.join(conf['PREFIX'], conf[path])
     except:
         logging.exception('Error reading configuration: %s', conf_file)
 
@@ -196,7 +201,6 @@ def main():
         manifest_file = os.path.join(conf['OUT_SUBDIR'], 'crawl-manifest.json')
         with open(manifest_file, 'w') as f:
             json.dump(manifest, f)
-        f.closed
 
         logging.info('Set up output subdirectory: %s', conf['OUT_SUBDIR'])
     except:
@@ -329,7 +333,6 @@ def main():
         if os.path.exists(main_manifest_file):
             with open(main_manifest_file, 'r') as f:
                 main_manifest = json.load(f)
-            f.closed
         else:
             main_manifest = {'dates': []}
 
@@ -340,7 +343,6 @@ def main():
 
         with open(main_manifest_file, 'w') as f:
             json.dump(main_manifest, f)
-        f.closed
 
     except:
         logging.exception('Error saving main manifest')
@@ -367,15 +369,14 @@ def main():
         with open(rsync_exclude_path, 'w') as f:
             for entry in conf['RSYNC_EXCLUDE']:
                 f.write('%s\n' % entry)
-        f.closed
 
+        # TODO: remove
         # renew kerberos ticket
-        subprocess.check_call('kinit -R'.split())
+        #subprocess.check_call('kinit -R'.split())
 
         # sync files
-        rsync_cmd = '%s -avz --delete --delete-excluded --exclude-from=%s %s %s:%s' %\
-            (RSYNC, rsync_exclude_path, conf['OUTDIR'], conf['WEB_SERVER'],\
-            conf['WEB_SERVER_DIR'])
+        rsync_cmd = '%s -avz --delete --delete-excluded --exclude-from=%s %s %s' %\
+            (RSYNC, rsync_exclude_path, conf['OUTDIR'], conf['WEB_SERVER_DIR'])
         logging.debug('Running rsync: %s', rsync_cmd)
         subprocess.check_call(rsync_cmd.split())
     except:
@@ -410,7 +411,6 @@ def main():
         smtp_conf = None
         with open(conf['SMTP_CONF'], 'r') as f:
             smtp_conf = eval(f.read())
-        f.closed
 
         send_mail('dtbn07@gmail.com',\
                   ['dtbn07@gmail.com'],\
