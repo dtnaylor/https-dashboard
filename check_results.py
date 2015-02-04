@@ -190,8 +190,10 @@ def main():
 
             # collect recent statuses for this URL
             for crawl in recent_crawls:
-                if url not in loaders[crawl][uagent].page_results: continue
-                statuses.append(loaders[crawl][uagent].page_results[url].status)
+                try:
+                    statuses.append(loaders[crawl][uagent].page_results[url].status)
+                except KeyError:
+                    continue
 
             # count how many times this URL generated this status
             status_counts = defaultdict(int)

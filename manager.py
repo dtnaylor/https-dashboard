@@ -333,6 +333,8 @@ def main():
         if os.path.exists(main_manifest_file):
             with open(main_manifest_file, 'r') as f:
                 main_manifest = json.load(f)
+            if 'dates' not in main_manifest:
+                main_manifest['dates'] = []
         else:
             main_manifest = {'dates': []}
 
@@ -375,7 +377,7 @@ def main():
         #subprocess.check_call('kinit -R'.split())
 
         # sync files
-        rsync_cmd = '%s -avz --delete --delete-excluded --exclude-from=%s %s %s' %\
+        rsync_cmd = '%s -avz --no-g --delete --delete-excluded --exclude-from=%s %s %s' %\
             (RSYNC, rsync_exclude_path, conf['OUTDIR'], conf['WEB_SERVER_DIR'])
         logging.debug('Running rsync: %s', rsync_cmd)
         subprocess.check_call(rsync_cmd.split())
