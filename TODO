@@ -6,5 +6,5 @@
 - rolling log files
 - http://www.cs.cmu.edu/~help/afs/authenticating_daemons.html
 - List of crawl dates in UI will get out of hand
-- Test if rotating handler worked for HAR generator; make sure logging not going to stdout; copy har generator to real repo; add rotating handler to other scripts
+- Test if rotating handler worked for HAR generator; make sure logging not going to stdout (it is...)
 - loading data animation?
