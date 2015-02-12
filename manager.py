@@ -266,6 +266,18 @@ def main():
             
         timelog.record_time('%s: HARs' % user_agent_tag)
 
+        ##
+        ## STAGE ONE-2: Save compressed copy of the HARs
+        ##
+        try:
+            tarball_path = os.path.join(conf['HAR_ARCHIVE_DIR'], '%s_%s.tgz' %\
+                (today, user_agent_tag))
+            tar_cmd = '(cd %s && pwd && tar -czf %s *.har)' % (uagent_tmpdir, tarball_path)
+            logging.debug('Making tarball of HARs: %s', tar_cmd)
+            subprocess.check_call(tar_cmd, shell=True)  # TODO: careful!
+        except:
+            logging.exception('Error saving compressed HARs to archive.')
+
 
         ##
         ## STAGE TWO: Capture screenshots for the URLs
@@ -283,10 +295,9 @@ def main():
             logging.exception('Error capturing screenshots for user agent %s', user_agent_tag)
             # TODO: mark error?
         timelog.record_time('%s: screenshots' % user_agent_tag)
-
-
+        
         ##
-        ## STAGE TWO AND A HALF: Copy pickled results from tmpdir to outdir
+        ## STAGE TWO-2: Copy pickled results from tmpdir to outdir
         ##
         try:
             for pickle_file in glob.glob(uagent_tmpdir + '/*.pickle'):
@@ -353,6 +364,7 @@ def main():
 
     ##
     ## Purge screenshots older than a week
+    ## TODO: purge old HAR archives
     ##
     try:
         logging.info('Purging old screenshots')
