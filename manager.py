@@ -272,7 +272,7 @@ def main():
         try:
             tarball_path = os.path.join(conf['HAR_ARCHIVE_DIR'], '%s_%s.tgz' %\
                 (today, user_agent_tag))
-            tar_cmd = '(cd %s && pwd && tar -czf %s *.har)' % (uagent_tmpdir, tarball_path)
+            tar_cmd = '(cd %s && tar -czf %s *.har)' % (uagent_tmpdir, tarball_path)
             logging.debug('Making tarball of HARs: %s', tar_cmd)
             subprocess.check_call(tar_cmd, shell=True)  # TODO: careful!
         except:
@@ -363,14 +363,20 @@ def main():
 
 
     ##
-    ## Purge screenshots older than a week
-    ## TODO: purge old HAR archives
+    ## Purge old crawl data
     ##
+    # keep only the last week of screenshots
     try:
         logging.info('Purging old screenshots')
         purge.purge_screenshots(conf['OUTDIR'], 7)
     except:
         logging.exception('Error purging old screenshots')
+    # keep the last week of HAR tarballs plus one per week before that
+    try:
+        logging.info('Purging old HAR archives')
+        purge.purge_hars(conf['HAR_ARCHIVE_DIR'], 7, 7)
+    except:
+        logging.exception('Error purging old HAR archives')
 
 
 

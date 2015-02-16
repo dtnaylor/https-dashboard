@@ -9,6 +9,11 @@ import sys
 import argparse
 import logging
 import glob
+import datetime
+
+import pprint
+
+from collections import defaultdict
 
 
 def setup_logging():
@@ -38,20 +43,42 @@ def purge_screenshots(profile_dir, num_to_keep):
 
     # remove screenshots from all but the newest num_to_keep
     for crawl_dir in crawl_dirs[num_to_keep:]:
+        logging.debug('Removing screenshots for crawl: %s', crawl_dir)
         for screenshot in [img for img in\
             glob.glob('%s/*/site_screenshots/*.png' % crawl_dir)\
-            if 'thumb' not in img]:                      # filter out thumbnails
+            if 'thumb' not in img]:                      # don't delete thumbnails
 
             try:
-                logging.debug('Removing %s', screenshot)
                 os.remove(screenshot)
             except:
                 logging.exception('Error removing %s', screenshot)
 
 
-# TODO: implement
-def purge_hars(har_archive_dir, frequency_to_keep):
-    pass
+def purge_hars(har_archive_dir, num_to_keep, frequency_to_keep):
+    '''Keep the most recent num_to_keep HAR tarballs. For older tarballs, keep
+       every nth, where n is frequency_to_keep'''
+    
+    # get a list of the HAR tarballs
+    har_tarballs = glob.glob(har_archive_dir + '/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_*.tgz')
+    har_tarballs = sorted(har_tarballs, reverse=True)
+
+    # store in dict where key is datetime of tarballs date
+    tarballs_by_date = defaultdict(list)
+    for har_tarball in har_tarballs:
+        date_string = os.path.split(har_tarball)[1].split('_')[0]
+        date = datetime.datetime.strptime(date_string, '%Y-%m-%d')
+        tarballs_by_date[date].append(har_tarball)
+        
+    # if date is older than num_to_keep days, only keep frequency_to_keep
+    dates = sorted(tarballs_by_date.keys(), reverse=True)
+    epoch = datetime.datetime.utcfromtimestamp(0)
+    for date in dates[num_to_keep:]:
+        if (date - epoch).days % frequency_to_keep != 0:
+            for tarball in tarballs_by_date[date]:
+                logging.debug('Removing HAR archive: %s' % tarball)
+                os.remove(tarball)
+        
+
 
 
 
@@ -64,7 +91,7 @@ def main():
         if not args.hars:
             logging.error('Please specify the HAR archive directory.')
         else:
-            purge_hars(args.hars, args.keepfreq)
+            purge_hars(args.hars, args.keepnum, args.keepfreq)
 
 
 
