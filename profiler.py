@@ -17,6 +17,7 @@ import json
 import logging
 import glob
 from collections import defaultdict
+from logging import handlers
 
 sys.path.append('./web-profiler')
 from webloader.har import Har, HarError
@@ -433,19 +434,27 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # set up logging
+    logfmt = "%(levelname) -10s %(asctime)s %(module)s:%(lineno) -7s %(message)s"
     if args.quiet:
         level = logging.WARNING
     elif args.verbose:
         level = logging.DEBUG
     else:
         level = logging.INFO
-    config = {
-        'format' : "%(levelname) -10s %(asctime)s %(module)s:%(lineno) -7s %(message)s",
-        'level' : level
-    }
+    logging.getLogger('').setLevel(level)
+
     if args.logfile:
-        config['filename'] = args.logfile
-    logging.basicConfig(**config)
+        # log to file (capped at 10 MB)
+        file_handler = handlers.RotatingFileHandler(args.logfile,\
+            maxBytes=10*1024*1024, backupCount=3)
+        file_handler.setFormatter(logging.Formatter(fmt=logfmt))
+        file_handler.setLevel(level)
+        logging.getLogger('').addHandler(file_handler)
+    else:
+        logging.basicConfig(level=level, format=logfmt)
+    
+
+
     
     # set up output directory
     try:

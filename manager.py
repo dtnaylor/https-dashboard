@@ -46,28 +46,32 @@ def setup_logging():
     if not os.path.exists(os.path.join(conf['PREFIX'], 'logs')):
         os.makedirs(os.path.join(conf['PREFIX'], 'logs'))
 
+    logfmt = "%(levelname) -10s %(asctime)s %(module)s:%(lineno) -7s %(message)s"
     if args.quiet:
         level = logging.WARNING
     elif args.verbose:
         level = logging.DEBUG
     else:
         level = logging.INFO
-    config = {
-        'filename': conf['MANAGER_LOG'],
-        'format' : "%(levelname) -10s %(asctime)s %(module)s:%(lineno) -7s %(message)s",
-        'level' : level
-    }
-    logging.basicConfig(**config)
+
+    logging.getLogger('').setLevel(level)
+
+    # log to file (capped at 10 MB)
+    file_handler = handlers.RotatingFileHandler(conf['MANAGER_LOG'],\
+        maxBytes=10*1024*1024, backupCount=3)
+    file_handler.setFormatter(logging.Formatter(fmt=logfmt))
+    file_handler.setLevel(level)
+    logging.getLogger('').addHandler(file_handler)
 
     # email me on error or exception
     smtp_conf = None
     with open(conf['SMTP_CONF'], 'r') as f:
         smtp_conf = eval(f.read())
-
     email_handler = handlers.SMTPHandler(\
         smtp_conf['server'], 'dtbn07@gmail.com',\
         ['dtbn07@gmail.com'], 'HTTPS Dashboard Error',\
         credentials=smtp_conf['credentials'], secure=())
+    email_handler.setFormatter(logging.Formatter(fmt=logfmt))
     email_handler.setLevel(logging.ERROR)
     logging.getLogger('').addHandler(email_handler)
 
@@ -377,6 +381,12 @@ def main():
         purge.purge_hars(conf['HAR_ARCHIVE_DIR'], 7, 7)
     except:
         logging.exception('Error purging old HAR archives')
+    # delete stdout files larger than 10 MB
+    try:
+        logging.info('Purging large stdout logs')
+        purge.purge_logs(os.path.join(conf['PREFIX'], 'logs'), 10*1024*1024)
+    except:
+        logging.exception('Error purging large logs')
 
 
 

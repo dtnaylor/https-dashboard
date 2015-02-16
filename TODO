@@ -5,7 +5,6 @@
 - make table sorting work (site list)
 - rolling log files
 - List of crawl dates in UI will get out of hand
-- Test if rotating handler worked for HAR generator; make sure logging not going to stdout (it is...)
 - loading data animation?
 - Per-site timeline
 - More summary plots? CDF?
