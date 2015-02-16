@@ -321,7 +321,8 @@ def main():
             ['HTTPS Only', len(https_only_harpaths)],
             ['Both', len(both_harpaths)]
         ]
-        basic_stats = ('num_objects', 'num_tcp_handshakes', 'num_mbytes', 'num_hosts',)
+        basic_stats = ('num_objects', 'num_tcp_handshakes', 'num_mbytes', 'num_hosts',
+                       'mean_object_size', 'median_object_size',)
 
         # extract stats from the sites accessible over only HTTP
         for http_path in http_only_harpaths:
