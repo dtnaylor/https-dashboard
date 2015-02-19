@@ -317,7 +317,9 @@ def main():
             profiler_cmd = '%s -d %s -o %s -g %s -v' %\
                 (PROFILER, uagent_tmpdir, uagent_outdir, conf['PROFILER_LOG'])
             logging.debug('Running profiler: %s', profiler_cmd)
-            subprocess.check_call(profiler_cmd.split())
+            with open(conf['PROFILER_STDOUT'], 'a') as f:
+                subprocess.check_call(profiler_cmd.split(), stdout=f,\
+                    stderr=subprocess.STDOUT)
         except:
             logging.exception('Error profiling user agent %s', user_agent_tag)
             # TODO: mark error?
