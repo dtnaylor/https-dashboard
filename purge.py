@@ -43,12 +43,12 @@ def purge_screenshots(profile_dir, num_to_keep):
 
     # remove screenshots from all but the newest num_to_keep
     for crawl_dir in crawl_dirs[num_to_keep:]:
-        logging.debug('Removing screenshots for crawl: %s', crawl_dir)
         for screenshot in [img for img in\
             glob.glob('%s/*/site_screenshots/*.png' % crawl_dir)\
             if 'thumb' not in img]:                      # don't delete thumbnails
 
             try:
+                logging.debug('Removing screenshot: %s' % screenshot)
                 os.remove(screenshot)
             except:
                 logging.exception('Error removing %s', screenshot)
