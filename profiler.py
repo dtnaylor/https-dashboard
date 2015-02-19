@@ -29,6 +29,9 @@ except ImportError:
 
 GEOIP_DB = '/home/dnaylor/Downloads/GeoLite2-City.mmdb'
 location_cache = {}
+            
+obj_types = ('image', 'html', 'javascript', 'css', 'xml',\
+             'audio', 'video', 'flash', 'font', 'pdf', 'text')
 
 
 class ObjectStatus:
@@ -333,6 +336,7 @@ def main():
             except HarError:
                 logging.exception('Error parsing HAR')
                 continue
+            # save individual site profile
             save_profile(http_har, None, profile_dir())
             
             ##
@@ -352,6 +356,7 @@ def main():
             except HarError:
                 logging.exception('Error parsing HAR')
                 continue
+            # save individual site profile
             save_profile(None, https_har, profile_dir())
             
             ##
@@ -373,6 +378,7 @@ def main():
             except HarError:
                 logging.exception('Error parsing HAR')
                 continue
+            # save individual site profile
             save_profile(http_har, https_har, profile_dir())
 
             ##
@@ -384,6 +390,8 @@ def main():
                 'https_partial':'yes' if https_har.num_http_objects > 0 else 'no',
             })
 
+            # TODO: save some of the below for all sites, even if they don't support both?
+
             # number of objects fetched per protocol
             # will eventually sort three ways; for now, just temporarily put it 
             # in the order the HARs are in under 'sort-alpha'
@@ -391,7 +399,7 @@ def main():
             summary['http_site_protocol_counts']['HTTP']['sort-alpha'].append(http_har.num_http_objects)
             summary['http_site_protocol_counts']['HTTPS']['sort-alpha'].append(http_har.num_https_objects)
             summary['https_site_protocol_counts']['url']['sort-alpha'].append(https_har.base_url)
-            summary['https_site_protocol_counts']['HTTP']['sort-alpha'].append(https_har.num_http_objects)
+            summary['https_site_protocol_counts']['HTTP']['sort-alpha'].append(https_har.num_http_objects) 
             summary['https_site_protocol_counts']['HTTPS']['sort-alpha'].append(https_har.num_https_objects)
 
             # basic stats
@@ -402,8 +410,18 @@ def main():
                 summary[stat]['HTTP']['sort-alpha'].append(http_har.get_by_name(stat))
                 summary[stat]['HTTPS']['sort-alpha'].append(https_har.get_by_name(stat))
 
+            # object counts by file type
+            for obj_type in obj_types:
+                summary['num_objects_type_%s' % obj_type]['url']['sort-alpha']\
+                    .append(http_har.base_url)
+                summary['num_objects_type_%s' % obj_type]['HTTP']['sort-alpha']\
+                    .append(http_har.get_num_objects_by_type(obj_type))
+                summary['num_objects_type_%s' % obj_type]['HTTPS']['sort-alpha']\
+                    .append(https_har.get_num_objects_by_type(obj_type))
+
         # sort stats by HTTP and by HTTPS; save all three versions
-        for stat in basic_stats + ('http_site_protocol_counts', 'https_site_protocol_counts'):
+        for stat in basic_stats + ('http_site_protocol_counts', 'https_site_protocol_counts')\
+            + tuple('num_objects_type_%s' % obj_type for obj_type in obj_types):
             if len(summary[stat]) > 0:
                 three_sort(summary[stat])
 
