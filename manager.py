@@ -42,29 +42,36 @@ RESULT_CHECKER = './check_results.py'
 
 
 def setup_logging():
+    # make log directory if it doesn't exist
+    if not os.path.exists(os.path.join(conf['PREFIX'], 'logs')):
+        os.makedirs(os.path.join(conf['PREFIX'], 'logs'))
+
+    logfmt = "%(levelname) -10s %(asctime)s %(module)s:%(lineno) -7s %(message)s"
     if args.quiet:
         level = logging.WARNING
     elif args.verbose:
         level = logging.DEBUG
     else:
         level = logging.INFO
-    config = {
-        'filename': conf['MANAGER_LOG'],
-        'format' : "%(levelname) -10s %(asctime)s %(module)s:%(lineno) -7s %(message)s",
-        'level' : level
-    }
-    logging.basicConfig(**config)
+
+    logging.getLogger('').setLevel(level)
+
+    # log to file (capped at 10 MB)
+    file_handler = handlers.RotatingFileHandler(conf['MANAGER_LOG'],\
+        maxBytes=10*1024*1024, backupCount=3)
+    file_handler.setFormatter(logging.Formatter(fmt=logfmt))
+    file_handler.setLevel(level)
+    logging.getLogger('').addHandler(file_handler)
 
     # email me on error or exception
     smtp_conf = None
     with open(conf['SMTP_CONF'], 'r') as f:
         smtp_conf = eval(f.read())
-    f.closed
-
     email_handler = handlers.SMTPHandler(\
         smtp_conf['server'], 'dtbn07@gmail.com',\
         ['dtbn07@gmail.com'], 'HTTPS Dashboard Error',\
         credentials=smtp_conf['credentials'], secure=())
+    email_handler.setFormatter(logging.Formatter(fmt=logfmt))
     email_handler.setLevel(logging.ERROR)
     logging.getLogger('').addHandler(email_handler)
 
@@ -74,7 +81,9 @@ def load_conf(conf_file):
     try:
         with open(conf_file, 'r') as f:
             conf = eval(f.read())
-        f.closed
+
+        for path in conf['PATHS_TO_PREFIX']:
+            conf[path] = os.path.join(conf['PREFIX'], conf[path])
     except:
         logging.exception('Error reading configuration: %s', conf_file)
 
@@ -196,7 +205,6 @@ def main():
         manifest_file = os.path.join(conf['OUT_SUBDIR'], 'crawl-manifest.json')
         with open(manifest_file, 'w') as f:
             json.dump(manifest, f)
-        f.closed
 
         logging.info('Set up output subdirectory: %s', conf['OUT_SUBDIR'])
     except:
@@ -253,11 +261,26 @@ def main():
             if conf['USER_AGENTS'][user_agent_tag]['string']:
                 har_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
             logging.debug('Running HAR genrator: %s', har_cmd)
-            subprocess.check_call(har_cmd, shell=True)  # TODO: careful!
+            with open(conf['HAR_GENERATOR_STDOUT'], 'a') as f:
+                subprocess.check_call(har_cmd, stdout=f,\
+                    stderr=subprocess.STDOUT, shell=True)  # TODO: careful!
         except:
             logging.exception('Error capturing HARs for user agent %s', user_agent_tag)
             # TODO: mark error?
+            
         timelog.record_time('%s: HARs' % user_agent_tag)
+
+        ##
+        ## STAGE ONE-2: Save compressed copy of the HARs
+        ##
+        try:
+            tarball_path = os.path.join(conf['HAR_ARCHIVE_DIR'], '%s_%s.tgz' %\
+                (today, user_agent_tag))
+            tar_cmd = '(cd %s && tar -czf %s *.har)' % (uagent_tmpdir, tarball_path)
+            logging.debug('Making tarball of HARs: %s', tar_cmd)
+            subprocess.check_call(tar_cmd, shell=True)  # TODO: careful!
+        except:
+            logging.exception('Error saving compressed HARs to archive.')
 
 
         ##
@@ -269,15 +292,16 @@ def main():
             if conf['USER_AGENTS'][user_agent_tag]['string']:
                 screenshot_cmd += ' -u "%s"' % conf['USER_AGENTS'][user_agent_tag]['string']
             logging.debug('Running screenshot genrator: %s', screenshot_cmd)
-            subprocess.check_call(screenshot_cmd, shell=True)  # TODO: careful!
+            with open(conf['SCREENSHOT_GENERATOR_STDOUT'], 'a') as f:
+                subprocess.check_call(screenshot_cmd, stdout=f,\
+                    stderr=subprocess.STDOUT, shell=True)  # TODO: careful!
         except:
             logging.exception('Error capturing screenshots for user agent %s', user_agent_tag)
             # TODO: mark error?
         timelog.record_time('%s: screenshots' % user_agent_tag)
-
-
+        
         ##
-        ## STAGE TWO AND A HALF: Copy pickled results from tmpdir to outdir
+        ## STAGE TWO-2: Copy pickled results from tmpdir to outdir
         ##
         try:
             for pickle_file in glob.glob(uagent_tmpdir + '/*.pickle'):
@@ -293,7 +317,9 @@ def main():
             profiler_cmd = '%s -d %s -o %s -g %s -v' %\
                 (PROFILER, uagent_tmpdir, uagent_outdir, conf['PROFILER_LOG'])
             logging.debug('Running profiler: %s', profiler_cmd)
-            subprocess.check_call(profiler_cmd.split())
+            with open(conf['PROFILER_STDOUT'], 'a') as f:
+                subprocess.check_call(profiler_cmd.split(), stdout=f,\
+                    stderr=subprocess.STDOUT)
         except:
             logging.exception('Error profiling user agent %s', user_agent_tag)
             # TODO: mark error?
@@ -324,7 +350,8 @@ def main():
         if os.path.exists(main_manifest_file):
             with open(main_manifest_file, 'r') as f:
                 main_manifest = json.load(f)
-            f.closed
+            if 'dates' not in main_manifest:
+                main_manifest['dates'] = []
         else:
             main_manifest = {'dates': []}
 
@@ -335,7 +362,6 @@ def main():
 
         with open(main_manifest_file, 'w') as f:
             json.dump(main_manifest, f)
-        f.closed
 
     except:
         logging.exception('Error saving main manifest')
@@ -343,13 +369,26 @@ def main():
 
 
     ##
-    ## Purge screenshots older than a week
+    ## Purge old crawl data
     ##
+    # keep only the last week of screenshots
     try:
         logging.info('Purging old screenshots')
         purge.purge_screenshots(conf['OUTDIR'], 7)
     except:
         logging.exception('Error purging old screenshots')
+    # keep the last week of HAR tarballs plus one per week before that
+    try:
+        logging.info('Purging old HAR archives')
+        purge.purge_hars(conf['HAR_ARCHIVE_DIR'], 7, 7)
+    except:
+        logging.exception('Error purging old HAR archives')
+    # delete stdout files larger than 10 MB
+    try:
+        logging.info('Purging large stdout logs')
+        purge.purge_logs(os.path.join(conf['PREFIX'], 'logs'), 10*1024*1024)
+    except:
+        logging.exception('Error purging large logs')
 
 
 
@@ -362,15 +401,14 @@ def main():
         with open(rsync_exclude_path, 'w') as f:
             for entry in conf['RSYNC_EXCLUDE']:
                 f.write('%s\n' % entry)
-        f.closed
 
+        # TODO: remove
         # renew kerberos ticket
-        subprocess.check_call('kinit -R'.split())
+        #subprocess.check_call('kinit -R'.split())
 
         # sync files
-        rsync_cmd = '%s -avz --delete --delete-excluded --exclude-from=%s %s %s:%s' %\
-            (RSYNC, rsync_exclude_path, conf['OUTDIR'], conf['WEB_SERVER'],\
-            conf['WEB_SERVER_DIR'])
+        rsync_cmd = '%s -avz --no-g --delete --delete-excluded --exclude-from=%s %s %s' %\
+            (RSYNC, rsync_exclude_path, conf['OUTDIR'], conf['WEB_SERVER_DIR'])
         logging.debug('Running rsync: %s', rsync_cmd)
         subprocess.check_call(rsync_cmd.split())
     except:
@@ -405,7 +443,6 @@ def main():
         smtp_conf = None
         with open(conf['SMTP_CONF'], 'r') as f:
             smtp_conf = eval(f.read())
-        f.closed
 
         send_mail('dtbn07@gmail.com',\
                   ['dtbn07@gmail.com'],\

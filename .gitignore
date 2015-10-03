@@ -60,7 +60,7 @@ docs/_build/
 
 # Other
 smtp.conf
-profiles
 test.conf
 test.urls
-logs
+out.production
+out.test

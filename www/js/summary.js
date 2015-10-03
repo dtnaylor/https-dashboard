@@ -103,7 +103,16 @@ function load_protocol_counts(site, sort) {
     	    	                }
     	    	            }
     	    	        }
-    	    	    }
+    	    	    },
+					series: {
+            		    point: {
+            		        events: {
+            		            click: function () {
+									window.location.href = 'profile.html?site=' + this.category;
+            		            }
+            		        }
+            		    }
+            		}
     	    	},
     	        series: [{
     	            name: 'HTTP Objects',

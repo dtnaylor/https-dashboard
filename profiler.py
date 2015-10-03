@@ -17,6 +17,7 @@ import json
 import logging
 import glob
 from collections import defaultdict
+from logging import handlers
 
 sys.path.append('./web-profiler')
 from webloader.har import Har, HarError
@@ -28,6 +29,9 @@ except ImportError:
 
 GEOIP_DB = '/home/dnaylor/Downloads/GeoLite2-City.mmdb'
 location_cache = {}
+            
+obj_types = ('image', 'html', 'javascript', 'css', 'xml',\
+             'audio', 'video', 'flash', 'font', 'pdf', 'text')
 
 
 class ObjectStatus:
@@ -208,7 +212,6 @@ def save_profile(http_har, https_har, outdir):
     ## URLs
     ##
     if http_har:
-        print http_har.url
         profile['base-url'] = http_har.url.split('://')[1]
     else:
         profile['base-url'] = https_har.url.split('://')[1]
@@ -321,7 +324,8 @@ def main():
             ['HTTPS Only', len(https_only_harpaths)],
             ['Both', len(both_harpaths)]
         ]
-        basic_stats = ('num_objects', 'num_tcp_handshakes', 'num_mbytes', 'num_hosts',)
+        basic_stats = ('num_objects', 'num_tcp_handshakes', 'num_mbytes', 'num_hosts',
+                       'mean_object_size', 'median_object_size',)
 
         # extract stats from the sites accessible over only HTTP
         for http_path in http_only_harpaths:
@@ -332,6 +336,7 @@ def main():
             except HarError:
                 logging.exception('Error parsing HAR')
                 continue
+            # save individual site profile
             save_profile(http_har, None, profile_dir())
             
             ##
@@ -351,6 +356,7 @@ def main():
             except HarError:
                 logging.exception('Error parsing HAR')
                 continue
+            # save individual site profile
             save_profile(None, https_har, profile_dir())
             
             ##
@@ -372,6 +378,7 @@ def main():
             except HarError:
                 logging.exception('Error parsing HAR')
                 continue
+            # save individual site profile
             save_profile(http_har, https_har, profile_dir())
 
             ##
@@ -383,6 +390,8 @@ def main():
                 'https_partial':'yes' if https_har.num_http_objects > 0 else 'no',
             })
 
+            # TODO: save some of the below for all sites, even if they don't support both?
+
             # number of objects fetched per protocol
             # will eventually sort three ways; for now, just temporarily put it 
             # in the order the HARs are in under 'sort-alpha'
@@ -390,7 +399,7 @@ def main():
             summary['http_site_protocol_counts']['HTTP']['sort-alpha'].append(http_har.num_http_objects)
             summary['http_site_protocol_counts']['HTTPS']['sort-alpha'].append(http_har.num_https_objects)
             summary['https_site_protocol_counts']['url']['sort-alpha'].append(https_har.base_url)
-            summary['https_site_protocol_counts']['HTTP']['sort-alpha'].append(https_har.num_http_objects)
+            summary['https_site_protocol_counts']['HTTP']['sort-alpha'].append(https_har.num_http_objects) 
             summary['https_site_protocol_counts']['HTTPS']['sort-alpha'].append(https_har.num_https_objects)
 
             # basic stats
@@ -401,8 +410,18 @@ def main():
                 summary[stat]['HTTP']['sort-alpha'].append(http_har.get_by_name(stat))
                 summary[stat]['HTTPS']['sort-alpha'].append(https_har.get_by_name(stat))
 
+            # object counts by file type
+            for obj_type in obj_types:
+                summary['num_objects_type_%s' % obj_type]['url']['sort-alpha']\
+                    .append(http_har.base_url)
+                summary['num_objects_type_%s' % obj_type]['HTTP']['sort-alpha']\
+                    .append(http_har.get_num_objects_by_type(obj_type))
+                summary['num_objects_type_%s' % obj_type]['HTTPS']['sort-alpha']\
+                    .append(https_har.get_num_objects_by_type(obj_type))
+
         # sort stats by HTTP and by HTTPS; save all three versions
-        for stat in basic_stats + ('http_site_protocol_counts', 'https_site_protocol_counts'):
+        for stat in basic_stats + ('http_site_protocol_counts', 'https_site_protocol_counts')\
+            + tuple('num_objects_type_%s' % obj_type for obj_type in obj_types):
             if len(summary[stat]) > 0:
                 three_sort(summary[stat])
 
@@ -434,19 +453,27 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # set up logging
+    logfmt = "%(levelname) -10s %(asctime)s %(module)s:%(lineno) -7s %(message)s"
     if args.quiet:
         level = logging.WARNING
     elif args.verbose:
         level = logging.DEBUG
     else:
         level = logging.INFO
-    config = {
-        'format' : "%(levelname) -10s %(asctime)s %(module)s:%(lineno) -7s %(message)s",
-        'level' : level
-    }
+    logging.getLogger('').setLevel(level)
+
     if args.logfile:
-        config['filename'] = args.logfile
-    logging.basicConfig(**config)
+        # log to file (capped at 10 MB)
+        file_handler = handlers.RotatingFileHandler(args.logfile,\
+            maxBytes=10*1024*1024, backupCount=3)
+        file_handler.setFormatter(logging.Formatter(fmt=logfmt))
+        file_handler.setLevel(level)
+        logging.getLogger('').addHandler(file_handler)
+    else:
+        logging.basicConfig(level=level, format=logfmt)
+    
+
+
     
     # set up output directory
     try:

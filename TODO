@@ -1,9 +1,10 @@
-- file path manipulation library?
 - check reliability of protocol availability
 - manager should call har_gen + profiler as python functions, not processes
 - screenshot bug on mobile user agent: "Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19"  (try http://qq.com)
 - check_protocol should try multiple times?
 - make table sorting work (site list)
 - rolling log files
-- http://www.cs.cmu.edu/~help/afs/authenticating_daemons.html
 - List of crawl dates in UI will get out of hand
+- loading data animation?
+- Per-site timeline
+- More summary plots? CDF?
