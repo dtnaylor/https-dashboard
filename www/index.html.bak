@@ -9,9 +9,6 @@
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
-	<!-- Custom styles for this template -->
-    <link href="cover.css" rel="stylesheet">
-
 	<style>
 		/* Faded out hr */
 		hr.soften {
@@ -27,27 +24,37 @@
   </head>
   <body>
 
+	<div class="container">
 
-	<div class="site-wrapper">
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
 
-      <div class="site-wrapper-inner">
+		<!-- JUMBOTRON -->
+		<div class="row">
+		<div class="jumbotron">
+		  <h1>HTTPS Dashboard&nbsp;<sup><span style="font-size: 20px;" class="label label-default">BETA</span></sup> <span style="font-size: 250%;" class="pull-right glyphicon glyphicon-dashboard"></span></h1>
+		  <p>Monitoring the usage of HTTPS on the Web.</p>
+		  <p><a href="./summary.html" class="btn btn-primary btn-lg" role="button">Summary</a>&nbsp;&nbsp;&nbsp;<a href="./sites.html" class="btn btn-primary btn-lg" role="button">Per-Site Details</a></p>
+		</div> <!-- jumbotron -->
+		</div> <!-- row -->
 
-        <div class="cover-container">
 
-          <div class="inner cover">
-            <h1 class="cover-heading">We&#8217;re no longer here.</h1>
-            <p class="lead">Google is doing a great job tracking HTTPS support <a href="https://www.google.com/transparencyreport/https/grid/?hl=en">here</a>.</p>
-            <p class="lead">Instead, we&#8217;re focusing our efforts on tracking the adoption and performance of HTTP/2.</p>
-            <p class="lead">
-              <a href="http://isthewebhttp2yet.com" class="btn btn-lg btn-default">Learn more</a>
-            </p>
-          </div>
 
-        </div>
+		<p>&nbsp;</p>
+		<hr class="soften">
+		<p>&nbsp;</p>
 
-      </div>
+		<!-- LOGOS -->
+		<div class="row">
+		<div style="text-align: center;">
+			<a href="http://www.cs.cmu.edu"><img src="./img/cmu@2x.png" height="80px"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="http://www.tid.es"><img src="./img/tid@2x.png" height="80px"></a>&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="http://www.polito.it"><img src="./img/polito@2x.png" height="80px"></a>
+		</div> <!-- center block -->
+		</div> <!-- row -->
 
-    </div>
+    </div> <!-- container -->
+
 
 
 
